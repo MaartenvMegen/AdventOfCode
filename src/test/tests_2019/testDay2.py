@@ -25,7 +25,7 @@ class Day2Tester(unittest.TestCase):
             program.run_program()
             if program.get_result() == 19690720:
                 print("outcome is {}".format((100*noun)+verb))
-                self.assertEqual(6417, (100*noun)+verb)
+                self.assertEqual(6418, (100*noun)+verb)
                 break
 
     def test_short_opcode(self):
