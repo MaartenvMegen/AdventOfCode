@@ -16,9 +16,9 @@ class OrbitAnalyzer:
 
         self.find_orbits("COM", 0, ["COM"])
 
-    def find_orbits(self, orbitting_object, orbit_depth, origin):
+    def find_orbits(self, orbitted_object, orbit_depth, origin):
         orbit_depth += 1
-        for object_in_orbit in self.orbits_parsed[orbitting_object]:
+        for object_in_orbit in self.orbits_parsed[orbitted_object]:
             # print("current analyzing {} ; breadrumb {}".format(object_in_orbit, origin))
             self.breadcrumbs[object_in_orbit] = origin
             new_origin = origin.copy()
@@ -32,7 +32,7 @@ class OrbitAnalyzer:
         distance_ancestor_origin = len(self.breadcrumbs[origin]) - self.breadcrumbs[origin].index(ancestor) - 1
         distance_ancestor_destination = len(self.breadcrumbs[destination]) - self.breadcrumbs[origin].index(ancestor) - 1
 
-        print("You travel distance will be")
+        print("Your travel distance will be")
         return distance_ancestor_origin + distance_ancestor_destination
 
     def get_orbit_count(self):
