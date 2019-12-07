@@ -2,6 +2,7 @@ from enum import Enum
 
 
 # TODO make instruction respect direct/indirect mode
+from queue import Queue
 
 
 class Opcode(Enum):
@@ -38,7 +39,7 @@ class Instruction:
 
 class OpcodeRunner:
 
-    def __init__(self, program, inputs=None):
+    def __init__(self, program, inputs=None, name = "generic"):
         self.program = program
         self.memory = program.copy()
         self.pointer = 0
@@ -46,10 +47,17 @@ class OpcodeRunner:
                                  Opcode.OUTPUT: self.output, Opcode.JUMP_IF_TRUE: self.jump_if_true,
                                  Opcode.JUMP_IF_FALSE: self.jump_if_false, Opcode.LESS_THAN: self.less_than,
                                  Opcode.EQUALS: self.equals}
+        self.output_listeners = []
+        self.completion_listeners = []
+        self.name = name
+
         if inputs:
             self.inputs = inputs.copy()
+            self.inputs = Queue()
+            for input_data in inputs:
+                self.inputs.put(input_data)
         else:
-            self.inputs = None
+            self.inputs = Queue()
         self.outputs = []
 
     def reset(self):
@@ -57,24 +65,31 @@ class OpcodeRunner:
         self.pointer = 0
 
     def run_program(self):
+        print("Booting opcode runner: {}".format(self.name))
         while Instruction.parse(self.memory[self.pointer]).opcode != Opcode.HALT:
             instruction = Instruction.parse(self.memory[self.pointer])
             operation = self.opcode_to_method.get(instruction.opcode,
                                                   lambda: print("Unexpected opcode: {}".format(instruction.opcode)))
             operation(instruction)
 
+        for listener in self.completion_listeners:
+            listener.notify()
+
     def set_value(self, address_2, value):
         self.memory[address_2] = value
 
     def get_input(self, instruction):
-        input_value = self.inputs.pop(0)
+        input_value = self.inputs.get()
         address = self.memory[self.pointer + 1]
         self.set_value(address, input_value)
         self.pointer += 2
 
     def output(self, instruction):
-        print("Program result: {}".format(self.load_from_addr_pointer(self.pointer + 1)))
-        self.outputs.append(self.load_from_addr_pointer(self.pointer + 1))
+        value = self.load_from_addr_pointer(self.pointer + 1)
+        print("Program result: {}".format(value))
+        for listener in self.output_listeners:
+            listener.send_data(value)
+        self.outputs.append(value)
         self.pointer += 2
 
     def get_value(self, pointer, mode):
@@ -141,3 +156,12 @@ class OpcodeRunner:
 
     def get_outputs(self):
         return self.outputs
+
+    def send_data(self, value):
+        self.inputs.put(value)
+
+    def set_output_listener(self, listener):
+        self.output_listeners.append(listener)
+
+    def set_complete_listeners(self, listener):
+        self.completion_listeners.append(listener)
