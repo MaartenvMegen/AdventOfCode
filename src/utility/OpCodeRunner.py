@@ -1,8 +1,8 @@
 from enum import Enum
 
-
-# TODO make instruction respect direct/indirect mode
 from queue import Queue
+
+from src.utility.GrowingList import GrowingList
 
 
 class Opcode(Enum):
@@ -14,12 +14,14 @@ class Opcode(Enum):
     JUMP_IF_FALSE = 6
     LESS_THAN = 7
     EQUALS = 8
+    ADJUST_RELATIVE_BASE = 9
     HALT = 99
 
 
 class ParameterMode(Enum):
     POSITION = 0
     IMMEDIATE = 1
+    RELATIVE = 2
 
 
 class Instruction:
@@ -39,14 +41,15 @@ class Instruction:
 
 class OpcodeRunner:
 
-    def __init__(self, program, inputs=None, name = "generic"):
+    def __init__(self, program, inputs=None, name="generic"):
         self.program = program
-        self.memory = program.copy()
+        self.memory = GrowingList(program.copy())
         self.pointer = 0
+        self.relative_base = 0
         self.opcode_to_method = {Opcode.ADD: self.add, Opcode.MULTIPLY: self.multiply, Opcode.INPUT: self.get_input,
                                  Opcode.OUTPUT: self.output, Opcode.JUMP_IF_TRUE: self.jump_if_true,
                                  Opcode.JUMP_IF_FALSE: self.jump_if_false, Opcode.LESS_THAN: self.less_than,
-                                 Opcode.EQUALS: self.equals}
+                                 Opcode.EQUALS: self.equals, Opcode.ADJUST_RELATIVE_BASE: self.adjust_relative_base}
         self.output_listeners = []
         self.completion_listeners = []
         self.name = name
@@ -70,22 +73,29 @@ class OpcodeRunner:
             instruction = Instruction.parse(self.memory[self.pointer])
             operation = self.opcode_to_method.get(instruction.opcode,
                                                   lambda: print("Unexpected opcode: {}".format(instruction.opcode)))
+            #print("performing: {} - {} - {} - {}".format(instruction.opcode, instruction.mode_1, instruction.mode_2,
+            #                                             instruction.mode_3))
             operation(instruction)
 
         for listener in self.completion_listeners:
             listener.notify()
 
-    def set_value(self, address_2, value):
-        self.memory[address_2] = value
+    def set_value(self, address, value, mode):
+        if mode == ParameterMode.POSITION:
+            self.memory[address] = value
+        elif mode == ParameterMode.RELATIVE:
+            self.memory[address + self.relative_base] = value
+        else:
+            print("ERROR: unexpected mode: {}".format(mode))
 
     def get_input(self, instruction):
         input_value = self.inputs.get()
         address = self.memory[self.pointer + 1]
-        self.set_value(address, input_value)
+        self.set_value(address, input_value, instruction.mode_1)
         self.pointer += 2
 
     def output(self, instruction):
-        value = self.load_from_addr_pointer(self.pointer + 1)
+        value = self.get_value(self.pointer + 1, instruction.mode_1)
         print("Program result: {}".format(value))
         for listener in self.output_listeners:
             listener.send_data(value)
@@ -94,20 +104,22 @@ class OpcodeRunner:
 
     def get_value(self, pointer, mode):
         if mode == ParameterMode.POSITION:
-            return self.load_from_addr_pointer(pointer)
+            return self.memory[self.memory[pointer]]
         elif mode == ParameterMode.IMMEDIATE:
             return self.memory[pointer]
+        elif mode == ParameterMode.RELATIVE:
+            return self.memory[self.relative_base + self.memory[pointer]]
         else:
-            print("ERROR: unexpected mode")
+            print("ERROR: unexpected mode: {}".format(mode))
             return None
 
     def add(self, instruction):
         address, value_1, value_2 = self.get_params(instruction)
-        self.set_value(address, value_1 + value_2)
+        self.set_value(address, value_1 + value_2, instruction.mode_3)
 
     def multiply(self, instruction):
         address, value_1, value_2 = self.get_params(instruction)
-        self.set_value(address, value_1 * value_2)
+        self.set_value(address, value_1 * value_2, instruction.mode_3)
 
     def get_params(self, instruction):
         value_1 = self.get_value(self.pointer + 1, instruction.mode_1)
@@ -130,7 +142,7 @@ class OpcodeRunner:
             self.pointer += 3
 
     def less_than(self, instruction):
-        self.compare(instruction, lambda x,y: x < y)
+        self.compare(instruction, lambda x, y: x < y)
 
     def equals(self, instruction):
         self.compare(instruction, lambda x, y: x == y)
@@ -138,12 +150,14 @@ class OpcodeRunner:
     def compare(self, instruction, comparison):
         address, value_1, value_2 = self.get_params(instruction)
         if comparison(value_1, value_2):
-            self.set_value(address, 1)
+            self.set_value(address, 1, instruction.mode_3)
         else:
-            self.set_value(address, 0)
+            self.set_value(address, 0, instruction.mode_3)
 
-    def load_from_addr_pointer(self, pointer):
-        return self.memory[self.memory[pointer]]
+    def adjust_relative_base(self, instruction):
+        value = self.get_value(self.pointer + 1, instruction.mode_1)
+        self.relative_base += value
+        self.pointer += 2
 
     def set_pointer(self, address):
         self.pointer = address

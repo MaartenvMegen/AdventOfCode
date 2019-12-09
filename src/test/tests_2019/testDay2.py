@@ -2,7 +2,7 @@ import unittest
 from itertools import product
 
 from src.utility.Inputs import gravity_assist_opcode
-from src.utility.OpCodeRunner import OpcodeRunner
+from src.utility.OpCodeRunner import OpcodeRunner, ParameterMode
 
 
 class Day2Tester(unittest.TestCase):
@@ -19,8 +19,8 @@ class Day2Tester(unittest.TestCase):
 
         for noun, verb in product(range(100), range(100)):
             program.reset()
-            program.set_value(1, noun)
-            program.set_value(2, verb)
+            program.set_value(1, noun, ParameterMode.POSITION)
+            program.set_value(2, verb, ParameterMode.POSITION)
 
             program.run_program()
             if program.get_result() == 19690720:
