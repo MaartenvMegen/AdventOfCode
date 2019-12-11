@@ -73,8 +73,8 @@ class OpcodeRunner:
             instruction = Instruction.parse(self.memory[self.pointer])
             operation = self.opcode_to_method.get(instruction.opcode,
                                                   lambda: print("Unexpected opcode: {}".format(instruction.opcode)))
-            #print("performing: {} - {} - {} - {}".format(instruction.opcode, instruction.mode_1, instruction.mode_2,
-            #                                             instruction.mode_3))
+            # print("performing: {} - {} - {} - {}".format(instruction.opcode, instruction.mode_1, instruction.mode_2,
+            #                                              instruction.mode_3))
             operation(instruction)
 
         for listener in self.completion_listeners:
@@ -96,7 +96,7 @@ class OpcodeRunner:
 
     def output(self, instruction):
         value = self.get_value(self.pointer + 1, instruction.mode_1)
-        print("Program result: {}".format(value))
+        #print("Program result: {}".format(value))
         for listener in self.output_listeners:
             listener.send_data(value)
         self.outputs.append(value)
@@ -172,7 +172,7 @@ class OpcodeRunner:
         return self.outputs
 
     def send_data(self, value):
-        self.inputs.put(value)
+        self.inputs.put(int(value))
 
     def set_output_listener(self, listener):
         self.output_listeners.append(listener)
