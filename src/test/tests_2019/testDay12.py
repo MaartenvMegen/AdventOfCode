@@ -55,20 +55,8 @@ class Moon:
         xv, yv, zv = self.velocity
         return "pos=<x= {}, y= {}, z= {}, vel=<x = {}, y= {}, z= {}>".format(x, y, z, xv, yv, zv)
 
-    def to_string_x(self):
-        x, y, z = self.position
-        xv, yv, zv = self.velocity
-        return "<pos={}, vel={}>".format(x, xv)
-
-    def to_string_y(self):
-        x, y, z = self.position
-        xv, yv, zv = self.velocity
-        return "<pos={}, vel={}>".format(y, yv)
-
-    def to_string_z(self):
-        x, y, z = self.position
-        xv, yv, zv = self.velocity
-        return "<pos={}, vel={}>".format(z, zv)
+    def to_string_axis(self, axis):
+        return "<pos={}, vel={}>".format(self.position[axis], self.velocity[axis])
 
 
 class Day12Tester(unittest.TestCase):
@@ -113,7 +101,7 @@ class Day12Tester(unittest.TestCase):
         iteration = 0
         while not (rep_x_found and rep_y_found and rep_z_found):
 
-            history_description = self.get_hist_description_x(moons)
+            history_description = get_hist_description_axis(moons, 0)
             if history_description not in hist_x:
                 hist_x.add(history_description)
             elif not rep_x_found:
@@ -121,7 +109,7 @@ class Day12Tester(unittest.TestCase):
                 rep_x_found = True
                 rep_x = iteration
 
-            history_description = self.get_hist_description_y(moons)
+            history_description = get_hist_description_axis(moons, 1)
             if history_description not in hist_y:
                 hist_y.add(history_description)
             elif not rep_y_found:
@@ -129,7 +117,7 @@ class Day12Tester(unittest.TestCase):
                 rep_y_found = True
                 rep_y = iteration
 
-            history_description = self.get_hist_description_z(moons)
+            history_description = get_hist_description_axis(moons, 2)
             if history_description not in hist_z:
                 hist_z.add(history_description)
             elif not rep_z_found:
@@ -146,39 +134,28 @@ class Day12Tester(unittest.TestCase):
 
             iteration += 1
 
-        answer = self.get_lcm(rep_x, rep_y, rep_z)
+        answer = get_lcm(rep_x, rep_y, rep_z)
         self.assertEqual(307043147758488, answer)
 
-    @staticmethod
-    def get_lcm(x, y, z):
-        print("find common divisors")
-        divisors = []
-        for index in range(1, 286332 + 1):
-            if x % index == 0 and y % index == 0 and z % index == 0:
-                print("{} is shared by all numbers as divisor".format(index))
-                divisors.append(index)
-        total = x * y * z
-        greatest_common_divisor = max(divisors)
-        answer = total / (greatest_common_divisor * greatest_common_divisor)
-        return answer
 
-    def get_hist_description_x(self, moons):
-        history_description = ""
-        for moon in moons:
-            history_description += moon.to_string_x()
-        return history_description
+def get_lcm(x, y, z):
+    print("find common divisors")
+    divisors = []
+    for index in range(1, 286332 + 1):
+        if x % index == 0 and y % index == 0 and z % index == 0:
+            print("{} is shared by all numbers as divisor".format(index))
+            divisors.append(index)
+    total = x * y * z
+    greatest_common_divisor = max(divisors)
+    answer = total / (greatest_common_divisor * greatest_common_divisor)
+    return answer
 
-    def get_hist_description_y(self, moons):
-        history_description = ""
-        for moon in moons:
-            history_description += moon.to_string_y()
-        return history_description
 
-    def get_hist_description_z(self, moons):
-        history_description = ""
-        for moon in moons:
-            history_description += moon.to_string_z()
-        return history_description
+def get_hist_description_axis(moons, axis):
+    history_description = ""
+    for moon in moons:
+        history_description += moon.to_string_axis(axis)
+    return history_description
 
 
 if __name__ == '__main__':
