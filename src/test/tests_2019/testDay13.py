@@ -9,7 +9,7 @@ from src.utility.Screen import Screen
 
 class Day13Tester(unittest.TestCase):
 
-
+    @unittest.skip
     def test_something(self):
         arcade_program = OpcodeRunner(Inputs.arcade_program, name="arcade")
         # play for free!
