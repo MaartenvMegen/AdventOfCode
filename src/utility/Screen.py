@@ -27,8 +27,8 @@ class Screen:
         print("found {} blocks".format(blocks))
 
     def display(self, x, y, details):
-        if self.screen_info[y][x] == ObjectDetails.BLOCK and details == ObjectDetails.EMPTY:
-            print("removed a block")
+        # if self.screen_info[y][x] == ObjectDetails.BLOCK and details == ObjectDetails.EMPTY:
+        #     print("removed a block")
         self.screen_info[y][x] = details
 
     def render(self):

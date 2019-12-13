@@ -1,5 +1,6 @@
 import threading
 import time
+from _queue import Empty
 from enum import Enum
 from queue import Queue
 
@@ -47,6 +48,9 @@ class Arcade:
         self.joystick = Joystick()
         self.current_ball_pos = (0, 0)
         self.current_paddle_pos = (0, 0)
+        self.desired_joystick_orientation = Queue()
+        self.one_object_received = False
+        self.initial_run = True
 
     def run(self):
         self.running = True
@@ -55,12 +59,18 @@ class Arcade:
         print('Started arcade')
         while self.running:
             self.get_input_data()
+        # give other thread time to die?
+        time.sleep(1)
 
     def send_data(self, value):
         self.inputs.put(value)
 
     def get_input_data(self):
-        value = self.inputs.get()
+        try:
+            value = self.inputs.get(timeout=1)
+        except Empty:
+            return
+
         if self.state == State.EXPECTING_X:
             self.pixel_builder["x"] = value
             self.state = State.EXPECTING_Y
@@ -79,11 +89,33 @@ class Arcade:
                 self.screen.display(self.pixel_builder["y"], self.pixel_builder["x"], self.pixel_builder["details"])
 
     def update_positions(self, details):
-        if details == ObjectDetails.BALL:
-            self.current_ball_pos = (self.pixel_builder["x"], self.pixel_builder["y"])
+        if self.joystick.tilt == 0 and not self.initial_run:
+            # cannot expect a change in position of joystick
+            if details == ObjectDetails.BALL:
+                self.current_ball_pos = (self.pixel_builder["x"], self.pixel_builder["y"])
+                self.determine_joystick_orientation()
+            if details == ObjectDetails.HORIZONTAL_PADDLE:
+                self.current_paddle_pos = (self.pixel_builder["x"], self.pixel_builder["y"])
 
-        if details == ObjectDetails.HORIZONTAL_PADDLE:
-            self.current_paddle_pos = (self.pixel_builder["x"], self.pixel_builder["y"])
+        else:
+            if details == ObjectDetails.HORIZONTAL_PADDLE:
+                self.current_paddle_pos = (self.pixel_builder["x"], self.pixel_builder["y"])
+                if not self.one_object_received:
+                    self.one_object_received = True
+                else:
+                    self.determine_joystick_orientation()
+                    self.one_object_received = False
+                    self.initial_run = False
+            if details == ObjectDetails.BALL:
+                self.current_ball_pos = (self.pixel_builder["x"], self.pixel_builder["y"])
+                if not self.one_object_received:
+                    self.one_object_received = True
+                else:
+                    self.determine_joystick_orientation()
+                    self.one_object_received = False
+                    self.initial_run = False
+
+
 
 
     def notify(self):
@@ -96,25 +128,34 @@ class Arcade:
     def provide_joystick_orientation(self):
         print("Starting joystick thread")
         # wait for first data to arrive to be able to provide proper input
+
         while self.running:
-            time.sleep(0.1)
+            #time.sleep(0.1)
             # allow program to update the screen before we render
-            self.render_info()
+            #self.render_info()
             #print('please provide desired joystick orientation: left/right/neutral')
             #value = input()
             #self.joystick.set_tilt(value)
-            paddle_pos = self.current_paddle_pos[0]
-            bal_pos = self.current_ball_pos[0]
-            #print("paddle at {}. ball at {}".format(paddle_pos, bal_pos))
-            if paddle_pos > bal_pos:
-                self.joystick.set_tilt("left")
-            elif paddle_pos < bal_pos:
-                self.joystick.set_tilt("right")
-            else:
-                self.joystick.set_tilt("neutral")
 
             #print("sending: {} to program".format(self.joystick.get_value()))
-            self.program.send_data(self.joystick.get_value())
+            try:
+                self.program.send_data(self.desired_joystick_orientation.get(timeout=2))
+            except Empty:
+                pass
+
+    def determine_joystick_orientation(self):
+        paddle_pos = self.current_paddle_pos[0]
+        bal_pos = self.current_ball_pos[0]
+        #print("paddle at {}. ball at {}".format(paddle_pos, bal_pos))
+
+        if paddle_pos > bal_pos:
+            self.joystick.set_tilt("left")
+        elif paddle_pos < bal_pos:
+            self.joystick.set_tilt("right")
+        else:
+            self.joystick.set_tilt("neutral")
+
+        self.desired_joystick_orientation.put(self.joystick.get_value())
 
     def render_info(self):
         self.screen.render()
