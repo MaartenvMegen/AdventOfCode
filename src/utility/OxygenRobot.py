@@ -115,6 +115,7 @@ class OxygenRobot:
         return x, y
 
     def notify(self):
+        print("Program has halted")
         self.running = False
 
     def send_data(self, value):

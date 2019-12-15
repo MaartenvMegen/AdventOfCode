@@ -89,7 +89,11 @@ class OpcodeRunner:
             print("ERROR: unexpected mode: {}".format(mode))
 
     def get_input(self, instruction):
-        input_value = self.inputs.get()
+        try:
+            input_value = self.inputs.get(timeout=5)
+        except:
+            print("Timeout waiting for input. Shutting down: ".format(self.name))
+            exit(-1)
         address = self.memory[self.pointer + 1]
         self.set_value(address, input_value, instruction.mode_1)
         self.pointer += 2
