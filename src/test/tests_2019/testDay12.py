@@ -1,5 +1,8 @@
+import os
 import unittest
 from itertools import product
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Moon:
@@ -62,7 +65,7 @@ class Moon:
 class Day12Tester(unittest.TestCase):
 
     def test_actual(self):
-        with open("testday12-actual.txt", "r") as file:
+        with open(os.path.join(THIS_DIR, "testday12-actual.txt"), "r") as file:
             moons = [Moon.parse_moon(line.strip()) for line in file.readlines()]
 
         for iteration in range(1001):
@@ -95,7 +98,7 @@ class Day12Tester(unittest.TestCase):
         rep_y = 0
         rep_z = 0
 
-        with open("testday12-actual.txt", "r") as file:
+        with open(os.path.join(THIS_DIR, "testday12-actual.txt"), "r") as file:
             moons = [Moon.parse_moon(line.strip()) for line in file.readlines()]
 
         iteration = 0

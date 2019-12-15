@@ -1,6 +1,9 @@
+import os
 import re
 import unittest
 from collections import defaultdict
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 resource_list = {}
 shopping_list = defaultdict(int)
@@ -59,7 +62,7 @@ class MyTestCase(unittest.TestCase):
         recipe_count_resource.clear()
 
     def test_something(self):
-        with open("testday14_example.txt", "r") as file:
+        with open(os.path.join(THIS_DIR, "testday14_example.txt"), "r") as file:
             [self.parse_recipe(re.split(", | => | ", line.strip())) for line in file.readlines()]
 
         resource_list["ORE"] = Component("ORE", 1, [])
@@ -71,7 +74,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(31, shopping_list['ORE'])
 
     def test_something_2(self):
-        with open("testday14_example_2.txt", "r") as file:
+        with open(os.path.join(THIS_DIR, "testday14_example_2.txt"), "r") as file:
             [self.parse_recipe(re.split(", | => | ", line.strip())) for line in file.readlines()]
 
         resource_list["ORE"] = Component("ORE", 1, [])
@@ -83,7 +86,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(165, shopping_list['ORE'])
 
     def test_something_3(self):
-        with open("testday14_example_3.txt", "r") as file:
+        with open(os.path.join(THIS_DIR, "testday14_example_3.txt"), "r") as file:
             [self.parse_recipe(re.split(", | => | ", line.strip())) for line in file.readlines()]
 
         resource_list["ORE"] = Component("ORE", 1, [])
@@ -95,7 +98,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(13312, shopping_list['ORE'])
 
     def test_something_actual(self):
-        with open("testday14_input.txt", "r") as file:
+        with open(os.path.join(THIS_DIR, "testday14_input.txt"), "r") as file:
             [self.parse_recipe(re.split(", | => | ", line.strip())) for line in file.readlines()]
 
         resource_list["ORE"] = Component("ORE", 1, [])
@@ -113,7 +116,7 @@ class MyTestCase(unittest.TestCase):
             shopping_list.clear()
             recipe_count_resource.clear()
 
-            with open("testday14_input.txt", "r") as file:
+            with open(os.path.join(THIS_DIR, "testday14_input.txt"), "r") as file:
                 [self.parse_recipe(re.split(", | => | ", line.strip())) for line in file.readlines()]
 
             resource_list["ORE"] = Component("ORE", 1, [])
