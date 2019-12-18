@@ -118,7 +118,7 @@ class Day16Tester(unittest.TestCase):
         offset = int(result[0:7])
 
         self.assertEqual(303673, offset)
-        
+
 
 if __name__ == '__main__':
     unittest.main()
