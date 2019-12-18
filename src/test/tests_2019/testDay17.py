@@ -9,10 +9,7 @@ class Day17Tester(unittest.TestCase):
         myrobot = VacuumRobot()
         myrobot.run()
 
-    def test_seq_evaluation(self):
-        example ="longstringwithhelloandsomethingwithhellobutsometimesalsowithsomethingelsesomethinghello"
-        result = VacuumRobot.findLongestRepeatingSubSeq(example)
-        print(result)
+        self.assertEqual(7780, myrobot.alignment_param_sum, "Failed to find proper locations for scaffold intersections")
 
     def test_robot_part_2(self):
         myrobot = VacuumRobot()
@@ -24,6 +21,9 @@ class Day17Tester(unittest.TestCase):
 
         # start the robot
         myrobot.run()
+
+        # how much dust is collected?
+        self.assertEqual(1075882, myrobot.dust_collected, "Failed to collect all the dust")
 
 if __name__ == '__main__':
     unittest.main()

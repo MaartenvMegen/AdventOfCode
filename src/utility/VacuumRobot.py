@@ -46,6 +46,8 @@ class VacuumRobot:
         self.known_scaffolds = set()
         self.robot_loc = (0, 0)
         self.robot_orientation = NORTH
+        self.dust_collected = 0
+        self.alignment_param_sum = 0
 
     def run(self):
         self.program_thread.start()
@@ -65,6 +67,7 @@ class VacuumRobot:
     def send_data(self, value):
         if value > 127:
             print('incoming data {}'.format(value))
+            self.dust_collected = value
         self.imaging_data.put(value)
 
     def get_data(self):
@@ -119,6 +122,7 @@ class VacuumRobot:
                 alignment_params.append(alignment_param)
                 intersections.add(loc)
         print("sum alignments is: {}".format(sum(alignment_params)))
+        self.alignment_param_sum = sum(alignment_params)
 
         for y in range(37):
             x_line = ""
