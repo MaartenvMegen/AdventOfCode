@@ -1,6 +1,9 @@
+import os
 import unittest
 
 from src.utility import lineyielder
+
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 class Day1Tester(unittest.TestCase):
@@ -8,7 +11,7 @@ class Day1Tester(unittest.TestCase):
     def test_part_a_example(self):
         read_entries = set()
         answer = None
-        for line in lineyielder.yield_lines("example1.txt"):
+        for line in lineyielder.yield_lines(os.path.join(THIS_DIR, "example1.txt")):
             read_entries.add(int(line))
             if (2020 - int(line)) in read_entries:
                 answer = (2020 - int(line)) * int(line)
@@ -18,7 +21,7 @@ class Day1Tester(unittest.TestCase):
     def test_part_a(self):
         read_entries = set()
         answer = None
-        for line in lineyielder.yield_lines("parta.txt"):
+        for line in lineyielder.yield_lines(os.path.join(THIS_DIR, "parta.txt")):
             read_entries.add(int(line))
             if (2020 - int(line)) in read_entries:
                 answer = (2020 - int(line)) * int(line)
@@ -27,7 +30,7 @@ class Day1Tester(unittest.TestCase):
 
     def test_part_b_example(self):
         answer = None
-        expenses = [int(line) for line in lineyielder.yield_lines("example1.txt")]
+        expenses = [int(line) for line in lineyielder.yield_lines(os.path.join(THIS_DIR, "example1.txt"))]
 
         for expense in expenses:
             remainder = 2020 - expense
@@ -40,7 +43,7 @@ class Day1Tester(unittest.TestCase):
 
     def test_part_b(self):
         answer = None
-        expenses = [int(line) for line in lineyielder.yield_lines("parta.txt")]
+        expenses = [int(line) for line in lineyielder.yield_lines(os.path.join(THIS_DIR, "parta.txt"))]
 
         for expense in expenses:
             remainder = 2020 - expense

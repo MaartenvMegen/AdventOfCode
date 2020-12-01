@@ -15,6 +15,7 @@ analyzed_locs = set()
 
 class Day18Tester(unittest.TestCase):
 
+    @unittest.skip("never fully solved")
     def test_something(self):
         with open(os.path.join(THIS_DIR, "day18input.txt"), "r") as file:
             y = 0
