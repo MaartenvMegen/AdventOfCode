@@ -64,6 +64,17 @@ class Grid():
         else:
             return None
 
+    def get_point(self, x, y):
+        return self.grid[x, y]
+
+    def get_size(self):
+        all_locs = list(self.grid.keys())
+        x_locs = list(zip(*all_locs))[0]
+        y_locs = list(zip(*all_locs))[1]
+        x_min, x_max = min(x_locs), max(x_locs)
+        y_min, y_max = min(y_locs), max(y_locs)
+        return x_min, x_max, y_min, y_max
+
     def grid_to_string(self):
         all_locs = list(self.grid.keys())
         x_locs = list(zip(*all_locs))[0]

@@ -17,11 +17,7 @@ def get_valid_passwords_from_file(filename, validator):
 
 
 def validate_toboggen(pos_a, pos_b, char, passwd):
-    if passwd[int(pos_a) - 1] == char and not passwd[int(pos_b) - 1] == char:
-        return True
-    elif passwd[int(pos_b) - 1] == char and not passwd[int(pos_a) - 1] == char:
-        return True
-    return False
+    return (passwd[int(pos_a) - 1] == char) != (passwd[int(pos_b) - 1] == char)
 
 
 def validate_slide(minrep, maxrep, char, passwd):
