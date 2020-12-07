@@ -81,8 +81,8 @@ class Grid():
         y_locs = list(zip(*all_locs))[1]
         x_min, x_max = min(x_locs), max(x_locs)
         y_min, y_max = min(y_locs), max(y_locs)
-        print("current board size {} {} to {} {}".format(x_min, y_min, x_max, y_max))
-        print("---------------------------")
+        output = "current board size: x from {} to {}, y from {} to {}\n".format(x_min, x_max, y_min, y_max)
+        output += "---------------------------\n"
 
         for y in range(y_min, y_max + 1):
             x_string = ""
@@ -91,8 +91,10 @@ class Grid():
                     x_string += self.grid[(x, y)].symbol
                 else:
                     x_string += GRID_BLANK
-            print(x_string)
-        print("---------------------------")
+            output += x_string
+            output += "\n"
+        output += "---------------------------\n"
+        return output
 
 
     def search_a_b(self, a, b, symbols):
