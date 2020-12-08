@@ -1,21 +1,26 @@
 import os
 import unittest
-import copy
-from src.utility import lineyielder
 from src.utility.InstructionRunner import InstructionRunner
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def run_modified_instructions(filename):
-    instructions = [line.split(' ') for line in lineyielder.yield_lines_fp(filename, THIS_DIR)]
-    for index, instruction in enumerate(instructions):
-        modified_instruction = copy.deepcopy(instructions)
-        if instruction[0] == "nop":
-            modified_instruction[index][0] = "jmp"
-        elif instruction[0] == "jmp":
-            modified_instruction[index][0] = "nop"
-        machine = InstructionRunner(modified_instruction, 0)
+    program = InstructionRunner.compile_program(os.path.join(THIS_DIR, filename))
+
+    for swap_index, instruction in enumerate(program):
+        instruction, arguments = instruction
+        if instruction == InstructionRunner._Instructions["nop"]:
+            modified_instruction = InstructionRunner._Instructions["jmp"],arguments
+        elif instruction == InstructionRunner._Instructions["jmp"]:
+            modified_instruction = InstructionRunner._Instructions["nop"], arguments
+        else:
+            continue
+
+        modified_instructions = [instruction if not index == swap_index else modified_instruction for
+                                     index, instruction in enumerate(program)]
+
+        machine = InstructionRunner(modified_instructions, 0)
         code, value = machine.run()
         if code == 0:
             print(f'program succesfully returned value {value}')
@@ -24,8 +29,8 @@ def run_modified_instructions(filename):
 
 
 def run_machine(filename):
-    instructions = [line.split(' ') for line in lineyielder.yield_lines_fp(filename, THIS_DIR)]
-    machine = InstructionRunner(instructions, 0)
+    program = InstructionRunner.compile_program(os.path.join(THIS_DIR, filename))
+    machine = InstructionRunner(program, 0)
     return machine.run()
 
 

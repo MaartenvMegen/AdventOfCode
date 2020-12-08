@@ -1,39 +1,61 @@
+from src.utility import lineyielder
+
+
 class InstructionRunner:
 
     def __init__(self, program, pointer_start):
-        self.program = program
-        self.pointer = pointer_start
-        self.accumulator = 0
-        self.execute = {
-            "nop": lambda arg: self.nop(arg),
-            "acc": lambda arg: self.increment(arg),
-            "jmp": lambda arg: self.jump(arg)
-        }
-        self.executed_instruction = set()
+        self._program = program
+        self._pc = pointer_start
+        self._accumulator = 0
+        self._executed_instructions = set()
 
-    def nop(self, arg):
-        self.pointer += 1
+    def _nop(self, arg):
+        self._pc += 1
 
-    def jump(self, arg):
-        self.pointer += int(arg)
+    def _jump(self, arg):
+        self._pc += int(arg)
 
-    def increment(self, arg):
-        self.accumulator += int(arg)
-        self.pointer += 1
+    def _acc(self, arg):
+        self._accumulator += int(arg)
+        self._pc += 1
+
+    _Instructions = {
+        "nop": _nop,
+        "acc": _acc,
+        "jmp": _jump
+    }
 
     def run(self):
-        while self.pointer not in self.executed_instruction:
-            if self.pointer > len(self.program)-1:
+        while self._pc not in self._executed_instructions:
+            if self._pc >= len(self._program) or self._pc < 0:
                 break
-            instruction = self.program[self.pointer][0]
-            argument = self.program[self.pointer][1]
-            #print(f"Executing {instruction} {argument} current acc {self.accumulator}")
-            self.executed_instruction.add(self.pointer)
-            self.execute[instruction](argument)
+            instruction, arguments = self._program[self._pc]
+            # print(f"Executing {instruction} {argument} current acc {self.accumulator}")
+            self._executed_instructions.add(self._pc)
+            instruction(self, *arguments)
 
-        if self.pointer in self.executed_instruction:
-            #print("halted")
-            return -1, self.accumulator
+        if self._pc in self._executed_instructions:
+            # print("halted")
+            return -1, self._accumulator
         else:
             print('finished')
-            return 0, self.accumulator
+            return 0, self._accumulator
+
+    @staticmethod
+    def _parse_line(line):
+        parts = line.split(' ')
+        if len(parts) < 2:
+            raise InstructionParseException(f"Incomplete input: {line}")
+        instruction = parts[0]
+        if instruction not in InstructionRunner._Instructions.keys():
+            raise InstructionParseException(f"Invalid instruction: {instruction}")
+        arguments = parts[1:]
+        return InstructionRunner._Instructions[instruction], tuple(arguments)
+
+    @staticmethod
+    def compile_program(filename):
+        return [InstructionRunner._parse_line(line) for line in lineyielder.yield_lines(filename)]
+
+
+class InstructionParseException(Exception):
+    pass
