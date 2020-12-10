@@ -17,7 +17,7 @@ def validate_field_presence(passport):
         for field in expected_fields:
             _ = passport[field]
     except Exception as e:
-        print(f"missing required field: {e} for passport {passport}")
+        #print(f"missing required field: {e} for passport {passport}")
         return False
     return True
 
@@ -25,21 +25,24 @@ def validate_field_presence(passport):
 def validate_byr(passport):
     check = 1920 <= int(passport['byr']) <= 2002
     if not check:
-        print(f"invalid birthyear: {passport['byr']}")
+        #print(f"invalid birthyear: {passport['byr']}")
+        pass
     return check
 
 
 def validate_iyr(passport):
     check = 2010 <= int(passport['iyr']) <= 2020
     if not check:
-        print(f"invalid issue year: {passport['iyr']}")
+        # print(f"invalid issue year: {passport['iyr']}")
+        pass
     return check
 
 
 def validate_eyr(passport):
     check = 2020 <= int(passport['eyr']) <= 2030
     if not check:
-        print(f"invalid expiration year: {passport['eyr']}")
+        #print(f"invalid expiration year: {passport['eyr']}")
+        pass
     return check
 
 
@@ -54,7 +57,8 @@ def validate_hgt(passport):
     elif unit == 'in':
         check = 59 <= int(height) <= 76
     if not check:
-        print(f"invalid height: {passport['hgt']}")
+        #print(f"invalid height: {passport['hgt']}")
+        pass
     return check
 
 
@@ -63,14 +67,16 @@ def validate_hcl(passport):
     match = pass_re.match(passport['hcl'])
     check = True if match else False
     if not check:
-        print(f"invalid hair color: {passport['hcl']}")
+        #print(f"invalid hair color: {passport['hcl']}")
+        pass
     return check
 
 
 def validate_ecl(passport):
     check = passport['ecl'] in eye_colors
     if not check:
-        print(f"invalid eye color: {passport['ecl']}")
+        # print(f"invalid eye color: {passport['ecl']}")
+        pass
     return check
 
 
@@ -80,7 +86,8 @@ def validate_pid(passport):
     check = True if match else False
 
     if not check:
-        print(f"invalid pid: {passport['pid']}")
+        # print(f"invalid pid: {passport['pid']}")
+        pass
     return check
 
 
@@ -101,7 +108,7 @@ def get_valid_passports_from_file(filename, validators):
             for keyValue in keyValuePairs:
                 key, value = re.split(':', keyValue)
                 passport[key] = value
-    print(f'evaluated {evaluation_counter} passports')
+    #print(f'evaluated {evaluation_counter} passports')
     return passports
 
 
