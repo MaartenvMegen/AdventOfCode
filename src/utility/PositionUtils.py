@@ -1,3 +1,5 @@
+from functools import lru_cache
+
 import numpy as np
 
 GRID_BLANK = "_"
@@ -36,6 +38,9 @@ class Grid():
     def __init__(self):
         self.grid = dict()
 
+    def get_locations(self):
+        return self.grid.values()
+
     def add_location(self, point):
         self.grid[point.loc] = point
 
@@ -51,15 +56,61 @@ class Grid():
     def right(self, current_point):
         return self.get_new_pos(current_point, (1, 0))
 
+    def up_left(self, current_point):
+        return self.get_new_pos(current_point, (-1, -1))
+
+    def up_right(self, current_point):
+        return self.get_new_pos(current_point, (1, -1))
+
+    def down_right(self, current_point):
+        return self.get_new_pos(current_point, (-1, 1))
+
+    def down_left(self, current_point):
+        return self.get_new_pos(current_point, (1, 1))
+
     def neighbours(self, current_point):
         return [self.up(current_point), self.down(current_point), self.left(current_point), self.right(current_point) ]
 
+    def neighbours_diag(self, current_point):
+        return [self.up_left(current_point), self.up_right(current_point), self.down_left(current_point), self.down_right(current_point)]
+
+    def get_all_neighbours(self, current_point, ignore_symbol):
+        diag = self.neighbours_diag(current_point)
+        direct = self.neighbours(current_point)
+        return diag+direct
+
+    def get_closest_neighbours(self, current_point, ignore_symbol):
+        offsets = [ (1,1), (0, 1), (1,0), (-1, 0), (0, -1), (1, -1), (-1, 1), (-1, -1)]
+        return [self.get_closest(current_point, ignore_symbol, offset) for offset in offsets]
+
+    def get_closest(self, current_point, ignore_symbol, offsets):
+        x, y = current_point.loc
+        x_delta, y_delta = offsets
+
+        x_offset = x+x_delta
+        y_offset = y+y_delta
+        new_ref_point = Point(x_offset, y_offset, "_")
+        while True:
+            try:
+                loc = self.get_point(*new_ref_point.loc)
+                if loc.symbol != ignore_symbol:
+                    return loc
+                else:
+                    x_offset += x_delta
+                    y_offset += y_delta
+                    new_ref_point = Point(x_offset, y_offset, "_")
+                    #print(f'next ref {x_offset, y_offset}')
+            except:
+                return None
+
     def get_new_pos(self, current_point, offset):
         (x, y) = current_point.loc
+        #print(f'checking position: {current_point.loc}')
         (dx, dy) = offset
 
         new_pos = (x + dx, y+dy)
         if new_pos in self.grid.keys():
+            #print(f'found neighbour at {new_pos}')
             return self.grid[new_pos]
         else:
             return None

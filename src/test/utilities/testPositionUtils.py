@@ -45,6 +45,16 @@ class PositionUtilTester(unittest.TestCase):
         distance = grid.search_a_b(point_0_2, point_2_0, ["#", 'o', '*'])
         self.assertEqual(4, distance)
 
+    def test_closest(self):
+        grid = Grid()
+        for i in range(0,7):
+            grid.add_location(Point(i, 0, "L"))
+        grid.add_location(Point(2,0, "."))
+        print(grid.grid_to_string())
+        closest = [neighbour for neighbour in grid.get_closest_neighbours(Point(3,0,"L"), ".") if neighbour]
+        self.assertEqual(2, len(closest))
+
+
 
 if __name__ == '__main__':
     unittest.main()
