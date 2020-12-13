@@ -1,10 +1,12 @@
 import math
+import os
 import unittest
 
-import numpy as np
+THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def get_chinese_remainder(num, rem):
+    # inspired by : https://www.geeksforgeeks.org/chinese-remainder-theorem-set-2-implementation/
     outcomes = []
     prod = math.prod(num)
 
@@ -38,7 +40,7 @@ class Day13Tester(unittest.TestCase):
         self.assertEqual(295, answer)
 
     def test_a(self):
-        with open("input.txt") as input:
+        with open(os.path.join(THIS_DIR, "input.txt")) as input:
             target = int(input.readline())
             busses = input.readline().strip().split(",")
         busses = [int(bus) for bus in busses if bus != "x"]
@@ -47,12 +49,11 @@ class Day13Tester(unittest.TestCase):
         self.assertEqual(1915, bus * time)
 
     def test_b(self):
-        with open("input.txt") as input:
+        with open(os.path.join(THIS_DIR, "input.txt")) as input:
             _ = input.readline()
             busses = input.readline().strip().split(",")
         print(busses)
 
-        bus_order = [(int(nr), lane) for lane, nr in enumerate(busses) if nr != 'x']
         bus_order = [(int(nr), lane) for lane, nr in enumerate(busses) if nr != 'x']
         num, rem = zip(*bus_order)
         rem = [(num - rem) % num for rem, num in zip(rem, num)]
@@ -75,7 +76,7 @@ class Day13Tester(unittest.TestCase):
                          )
 
     def test_example_b(self):
-        with open("example.txt") as input:
+        with open(os.path.join(THIS_DIR, "example.txt")) as input:
             _ = input.readline()
             busses = input.readline().strip().split(",")
         print(busses)
