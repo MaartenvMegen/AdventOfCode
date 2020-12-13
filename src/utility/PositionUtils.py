@@ -2,6 +2,8 @@ from functools import lru_cache
 
 import numpy as np
 
+OFFSET = [(1, 1), (0, 1), (1, 0), (-1, 0), (0, -1), (1, -1), (-1, 1), (-1, -1)]
+
 GRID_BLANK = "_"
 
 
@@ -80,8 +82,8 @@ class Grid():
         return diag+direct
 
     def get_closest_neighbours(self, current_point, ignore_symbol):
-        offsets = [ (1,1), (0, 1), (1,0), (-1, 0), (0, -1), (1, -1), (-1, 1), (-1, -1)]
-        return [self.get_closest(current_point, ignore_symbol, offset) for offset in offsets]
+        for offset in OFFSET:
+            yield self.get_closest(current_point, ignore_symbol, offset)
 
     def get_closest(self, current_point, ignore_symbol, offsets):
         x, y = current_point.loc
@@ -89,16 +91,14 @@ class Grid():
 
         x_offset = x+x_delta
         y_offset = y+y_delta
-        new_ref_point = Point(x_offset, y_offset, "_")
         while True:
             try:
-                loc = self.get_point(*new_ref_point.loc)
+                loc = self.get_point(x_offset, y_offset)
                 if loc.symbol != ignore_symbol:
                     return loc
                 else:
                     x_offset += x_delta
                     y_offset += y_delta
-                    new_ref_point = Point(x_offset, y_offset, "_")
                     #print(f'next ref {x_offset, y_offset}')
             except:
                 return None
