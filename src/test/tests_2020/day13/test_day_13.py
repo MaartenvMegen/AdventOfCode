@@ -64,16 +64,14 @@ class Day13Tester(unittest.TestCase):
         num = [3, 4, 5]
         rem = [2, 3, 1]
 
-        self.assertEqual(11, get_chinese_remainder(num, rem)
-                         )
+        self.assertEqual(11, get_chinese_remainder(num, rem))
 
     def test_b_chinese_example_given(self):
         num = [17, 13, 19]
         rem = [0, 2, 3]
         rem = [(num - rem) % num for rem, num in zip(rem, num)]
 
-        self.assertEqual(3417, get_chinese_remainder(num, rem)
-                         )
+        self.assertEqual(3417, get_chinese_remainder(num, rem))
 
     def test_example_b(self):
         with open(os.path.join(THIS_DIR, "example.txt")) as input:
@@ -82,7 +80,7 @@ class Day13Tester(unittest.TestCase):
         print(busses)
 
         bus_order = [(int(nr), lane) for lane, nr in enumerate(busses) if nr != 'x']
-        num, rem  = zip(*bus_order)
+        num, rem = zip(*bus_order)
         rem = [(num - rem) % num for rem, num in zip(rem, num)]
 
         remainder = get_chinese_remainder(num, rem)
