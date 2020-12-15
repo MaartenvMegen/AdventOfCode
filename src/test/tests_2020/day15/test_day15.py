@@ -1,7 +1,6 @@
 import os
 import unittest
-from collections import defaultdict
-from numba import njit, numba
+from numba import njit
 from numba.typed import List
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
