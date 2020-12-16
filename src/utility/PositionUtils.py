@@ -70,6 +70,9 @@ class Grid():
     def down_left(self, current_point):
         return self.get_new_pos(current_point, (1, 1))
 
+    def neighbours(self, current_point):
+        return [self.up(current_point), self.down(current_point), self.left(current_point), self.right(current_point) ]
+
     def get_direct_neighbours(self, current_point, ignore_symbol):
         for offset in OFFSET:
             yield self.get_new_pos(current_point, offset)
