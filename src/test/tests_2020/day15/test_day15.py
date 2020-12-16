@@ -44,23 +44,23 @@ def play_game(starting_words, until=2020):
 
 class Day15Tester(unittest.TestCase):
     def test_example_a1(self):
-        prev_word = play_game([0, 3, 6])
+        prev_word = play_game(List([0, 3, 6]))
         self.assertEqual(436, prev_word)
 
     def test_example_a2(self):
-        prev_word = play_game([1, 3, 2])
+        prev_word = play_game(List([1, 3, 2]))
         self.assertEqual(1, prev_word)
 
     def test_example_a3(self):
-        prev_word = play_game([2, 1, 3])
+        prev_word = play_game(List([2, 1, 3]))
         self.assertEqual(10, prev_word)
 
     def test_example_a4(self):
-        prev_word = play_game([1, 2, 3])
+        prev_word = play_game(List([1, 2, 3]))
         self.assertEqual(27, prev_word)
 
     def test_a(self):
-        prev_word = play_game([17, 1, 3, 16, 19, 0])
+        prev_word = play_game(List([17, 1, 3, 16, 19, 0]))
         self.assertEqual(694, prev_word)
 
     def test_example_b1(self):
