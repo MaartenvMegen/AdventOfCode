@@ -1,8 +1,7 @@
+import itertools
 import os
-import re
 import unittest
 from collections import defaultdict
-from math import prod
 
 from src.utility import lineyielder
 
@@ -10,55 +9,29 @@ INACTIVE = "."
 ACTIVE = "#"
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
-OFFSET = [(1, 1, 0),
-          (0, 1, 0),
-          (1, 0, 0),
-          (-1, 0, 0),
-          (0, -1, 0),
-          (1, -1, 0),
-          (-1, 1, 0),
-          (-1, -1, 0),
 
-          (1, 1, 1),
-          (0, 1, 1),
-          (1, 0, 1),
-          (-1, 0, 1),
-          (0, -1, 1),
-          (1, -1, 1),
-          (-1, 1, 1),
-          (-1, -1, 1),
-          (0, 0, 1),
-
-          (1, 1, -1),
-          (0, 1, -1),
-          (1, 0, -1),
-          (-1, 0, -1),
-          (0, -1, -1),
-          (1, -1, -1),
-          (-1, 1, -1),
-          (-1, -1, -1),
-          (0, 0, -1)
-
-          ]
+def get_nd_offsets(n):
+    ofsets = -1, 0, 1
+    for permutation in itertools.product(ofsets, repeat=n):
+        if permutation != tuple([0] * n):
+            yield permutation
 
 
-class Grid3d():
-    def __init__(self):
+class GridN():
+    def __init__(self, n):
         self.grid = defaultdict()
+        self.dimensions = n
 
     def add_location(self, loc, symbol):
-        # print(f'adding loc {loc} for symbol {symbol}')
         self.grid[loc] = symbol
 
-    def get_direct_neighbours(self, current_point, neighbour_type):
-        for offset in OFFSET:
+    def get_direct_neighbours(self, current_point, neighbour_type, offsets):
+        for offset in offsets:
             yield from self.get_neighbour(current_point, offset, neighbour_type)
 
     def get_neighbour(self, loc, offset, neighbour_type):
-        (x, y, z) = loc
-        (dx, dy, dz) = offset
-        new_pos = (x + dx, y + dy, z + dz)
-        #print(f'checking neighbour at position: {new_pos}')
+        new_pos = tuple(coordinate + offset for coordinate, offset in zip(loc, offset))
+        # print(f'checking neighbour at position: {new_pos}')
         if new_pos in self.grid.keys():
             neighbour_symbol = self.grid[new_pos]
             if neighbour_symbol == neighbour_type:
@@ -66,56 +39,66 @@ class Grid3d():
 
     def get_size(self):
         all_locs = list(self.grid.keys())
-        x_locs = list(zip(*all_locs))[0]
-        y_locs = list(zip(*all_locs))[1]
-        z_locs = list(zip(*all_locs))[2]
-        x_min, x_max = min(x_locs), max(x_locs)
-        y_min, y_max = min(y_locs), max(y_locs)
-        z_min, z_max = min(z_locs), max(z_locs)
+        all_locs = list(zip(*all_locs))
 
-        return x_min, x_max, y_min, y_max, z_min, z_max
+        min_max_per_dimension = []
+
+        for n in range(0, self.dimensions):
+            min_loc = min(all_locs[n])
+            max_loc = max(all_locs[n])
+            min_max_per_dimension.append((min_loc, max_loc))
+
+        return min_max_per_dimension
 
     def grid_to_string(self):
-        x_min, x_max, y_min, y_max, z_min, z_max = self.get_size()
-        output = "current board size: x from {} to {}, y from {} to {}, z from {} to {}\n".format(x_min, x_max, y_min,
-                                                                                                  y_max, z_min, z_max)
+        min_max_per_dimension = self.get_size()
+
+        # Extract first 2 dimensions and plot those for each of the other dimensions
+        n_range = []
+        for n in range(0, self.dimensions):
+            n_range.append(range(min_max_per_dimension[n][0], min_max_per_dimension[n][1] + 1))
+
+        output = "---------BOARD-------------\n"
+        for dim, (min, max) in enumerate(min_max_per_dimension):
+            output += f"dimension {dim} has range {min} - {max}\n"
         output += "---------------------------\n"
-        for z in range(z_min, z_max + 1):
-            output += f"\nz={z}\n"
-            for y in range(y_min, y_max + 1):
-                x_string = ""
-                for x in range(x_min, x_max + 1):
-                    if (x, y, z) in self.grid.keys():
-                        x_string += self.grid[(x, y, z)]
+
+        for other_dims in itertools.product(*n_range[2:]):
+            if other_dims:
+                output += f"dimension {other_dims}\n"
+            for y in n_range[1]:
+                for x in n_range[0]:
+                    if (x, y, *other_dims) in self.grid.keys():
+                        output += self.grid[(x, y, *other_dims)]
                     else:
-                        x_string += INACTIVE
-                output += x_string
+                        output += INACTIVE
                 output += "\n"
-        output += "---------------------------\n"
+            output += "---------------------------\n"
         return output
 
 
 def cycle(grid):
-    x_min, x_max, y_min, y_max, z_min, z_max = grid.get_size()
-    # loop through grid and its edges
-    changed_locs = {}
+    min_max_per_dimension = grid.get_size()
+    changed_coordinates = {}
+    offsets = list(get_nd_offsets(grid.dimensions))
 
-    for z in range(z_min - 1, z_max + 2):
-        for y in range(y_min - 1, y_max + 2):
-            for x in range(x_min - 1, x_max + 2):
-                if (x,y,z) in grid.grid.keys():
-                    own_symbol = grid.grid[x,y,z]
-                else:
-                    own_symbol = INACTIVE
+    n_range = []
+    for n in range(0, grid.dimensions):
+        n_range.append(range(min_max_per_dimension[n][0] - 1, min_max_per_dimension[n][1] + 2))
 
-                active_neighbours = len(list(grid.get_direct_neighbours( (x,y,z), ACTIVE)))
-                if own_symbol == ACTIVE and not 2 <= active_neighbours <= 3:
-                    changed_locs[ x,y,z ] = INACTIVE
-                if own_symbol == INACTIVE and active_neighbours == 3:
-                    changed_locs[x,y,z] = ACTIVE
+    for coordinate in itertools.product(*n_range):
+        if coordinate in grid.grid.keys():
+            own_symbol = grid.grid[coordinate]
+        else:
+            own_symbol = INACTIVE
+        # print(f"evaluating position {option} current symbol {own_symbol}")
+        active_neighbours = len(list(grid.get_direct_neighbours(coordinate, ACTIVE, offsets)))
+        if own_symbol == ACTIVE and not 2 <= active_neighbours <= 3:
+            changed_coordinates[coordinate] = INACTIVE
+        if own_symbol == INACTIVE and active_neighbours == 3:
+            changed_coordinates[coordinate] = ACTIVE
 
-    for loc, symbol in changed_locs.items():
-        grid.grid[loc] = symbol
+    grid.grid.update(changed_coordinates)
 
 
 def get_active_cubes(grid):
@@ -124,30 +107,51 @@ def get_active_cubes(grid):
 
 class Day17Tester(unittest.TestCase):
 
-    def test_example_a(self):
-        grid = Grid3d()
+    def test_example_b(self):
+        grid = GridN(4)
         for y, line in enumerate(lineyielder.yield_lines_fp("./example.txt", THIS_DIR)):
             for x, char in enumerate(line):
-                grid.add_location((x, y, 0), char)
-        # print(grid.grid[(1, 0, 0)])
-        #print(list(grid.get_direct_neighbours((2, 2, 0), "#")))
+                grid.add_location((x, y, 0, 0), char)
 
-        #print(grid.grid_to_string())
-        for _ in range(0,6):
+        for i in range(0, 6):
+            #print(f'running cycle {i}')
             cycle(grid)
-        #print(grid.grid_to_string())
-        self.assertEqual(112, get_active_cubes(grid))
+            # print(grid.grid_to_string())
+        self.assertEqual(848, get_active_cubes(grid))
+
+    def test_b(self):
+        grid = GridN(4)
+        for y, line in enumerate(lineyielder.yield_lines_fp("./input.txt", THIS_DIR)):
+            for x, char in enumerate(line):
+                grid.add_location((x, y, 0, 0), char)
+
+        for i in range(0, 6):
+            #print(f'running cycle {i}')
+            cycle(grid)
+        self.assertEqual(1972, get_active_cubes(grid))
 
     def test_a(self):
-        grid = Grid3d()
+        grid = GridN(3)
         for y, line in enumerate(lineyielder.yield_lines_fp("./input.txt", THIS_DIR)):
             for x, char in enumerate(line):
                 grid.add_location((x, y, 0), char)
-        # print(grid.grid[(1, 0, 0)])
-        # print(list(grid.get_direct_neighbours((2, 2, 0), "#")))
 
-        # print(grid.grid_to_string())
         for _ in range(0, 6):
             cycle(grid)
-        # print(grid.grid_to_string())
+        self.assertEqual(295, get_active_cubes(grid))
+
+    def test_example_a(self):
+        grid = GridN(3)
+        for y, line in enumerate(lineyielder.yield_lines_fp("./example.txt", THIS_DIR)):
+            for x, char in enumerate(line):
+                grid.add_location((x, y, 0), char)
+
+        for _ in range(0, 6):
+            cycle(grid)
         self.assertEqual(112, get_active_cubes(grid))
+
+    def test_2d(self):
+        grid = GridN(2)
+        grid.add_location( (0,1) , "#")
+        grid.add_location( (1,0) , "#")
+        print(grid.grid_to_string())
