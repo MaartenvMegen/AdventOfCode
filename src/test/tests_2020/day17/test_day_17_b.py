@@ -1,3 +1,4 @@
+import copy
 import itertools
 import os
 import re
@@ -11,121 +12,29 @@ INACTIVE = "."
 ACTIVE = "#"
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
-OFFSET = [(1, 1, 0, 0),
-          (0, 1, 0, 0),
-          (1, 0, 0, 0),
-          (-1, 0, 0, 0),
-          (0, -1, 0, 0),
-          (1, -1, 0, 0),
-          (-1, 1, 0, 0),
-          (-1, -1, 0, 0),
 
-          (1, 1, 1, 0),
-          (0, 1, 1, 0),
-          (1, 0, 1, 0),
-          (-1, 0, 1, 0),
-          (0, -1, 1, 0),
-          (1, -1, 1, 0),
-          (-1, 1, 1, 0),
-          (-1, -1, 1, 0),
-          (0, 0, 1, 0),
-
-          (1, 1, -1, 0),
-          (0, 1, -1, 0),
-          (1, 0, -1, 0),
-          (-1, 0, -1, 0),
-          (0, -1, -1, 0),
-          (1, -1, -1, 0),
-          (-1, 1, -1, 0),
-          (-1, -1, -1, 0),
-          (0, 0, -1, 0),
-
-          (1, 1, 0, -1),
-          (0, 1, 0, -1),
-          (1, 0, 0, -1),
-          (-1, 0, 0, -1),
-          (0, -1, 0, -1),
-          (1, -1, 0, -1),
-          (-1, 1, 0, -1),
-          (-1, -1, 0, -1),
-          (0, 0, 0, -1),
-
-          (1, 1, 1, -1),
-          (0, 1, 1, -1),
-          (1, 0, 1, -1),
-          (-1, 0, 1, -1),
-          (0, -1, 1, -1),
-          (1, -1, 1, -1),
-          (-1, 1, 1, -1),
-          (-1, -1, 1, -1),
-          (0, 0, 1, -1),
-
-          (1, 1, -1, -1),
-          (0, 1, -1, -1),
-          (1, 0, -1, -1),
-          (-1, 0, -1, -1),
-          (0, -1, -1, -1),
-          (1, -1, -1, -1),
-          (-1, 1, -1, -1),
-          (-1, -1, -1, -1),
-          (0, 0, -1, -1),
-
-          (1, 1, 0, 1),
-          (0, 1, 0, 1),
-          (1, 0, 0, 1),
-          (-1, 0, 0, 1),
-          (0, -1, 0, 1),
-          (1, -1, 0, 1),
-          (-1, 1, 0, 1),
-          (-1, -1, 0, 1),
-          (0, 0, 0, 1),
-
-          (1, 1, 1, 1),
-          (0, 1, 1, 1),
-          (1, 0, 1, 1),
-          (-1, 0, 1, 1),
-          (0, -1, 1, 1),
-          (1, -1, 1, 1),
-          (-1, 1, 1, 1),
-          (-1, -1, 1, 1),
-          (0, 0, 1, 1),
-
-          (1, 1, -1, 1),
-          (0, 1, -1, 1),
-          (1, 0, -1, 1),
-          (-1, 0, -1, 1),
-          (0, -1, -1, 1),
-          (1, -1, -1, 1),
-          (-1, 1, -1, 1),
-          (-1, -1, -1, 1),
-          (0, 0, -1, 1),
-
-          ]
-
-def get_ND_offsets(n):
-    ofsets = -1,0,1
-    for permutation in itertools.permutations(ofsets, n):
-        if permutation != [0] * n:
+def get_nd_offsets(n):
+    ofsets = -1, 0, 1
+    for permutation in itertools.product(ofsets, repeat=n):
+        if permutation != tuple([0] * n):
             yield permutation
 
 
-class Grid3d():
-    def __init__(self):
+class GridN():
+    def __init__(self, n):
         self.grid = defaultdict()
+        self.dimensions = n
 
     def add_location(self, loc, symbol):
-        # print(f'adding loc {loc} for symbol {symbol}')
         self.grid[loc] = symbol
 
-    def get_direct_neighbours(self, current_point, neighbour_type):
-        for offset in OFFSET:
+    def get_direct_neighbours(self, current_point, neighbour_type, offsets):
+        # print(f'finding neighbour for offset for dimensions {self.dimensions}')
+        for offset in offsets:
             yield from self.get_neighbour(current_point, offset, neighbour_type)
 
     def get_neighbour(self, loc, offset, neighbour_type):
-        (x, y, z, w) = loc
-        (dx, dy, dz, dw) = offset
         new_pos = tuple(coordinate + offset for coordinate, offset in zip(loc, offset))
-        new_pos = (x + dx, y + dy, z + dz, w + dw)
         # print(f'checking neighbour at position: {new_pos}')
         if new_pos in self.grid.keys():
             neighbour_symbol = self.grid[new_pos]
@@ -134,61 +43,70 @@ class Grid3d():
 
     def get_size(self):
         all_locs = list(self.grid.keys())
-        x_locs = list(zip(*all_locs))[0]
-        y_locs = list(zip(*all_locs))[1]
-        z_locs = list(zip(*all_locs))[2]
-        w_locs = list(zip(*all_locs))[3]
+        all_locs = list(zip(*all_locs))
 
-        x_min, x_max = min(x_locs), max(x_locs)
-        y_min, y_max = min(y_locs), max(y_locs)
-        z_min, z_max = min(z_locs), max(z_locs)
-        w_min, w_max = min(w_locs), max(w_locs)
+        min_max_per_dimension = []
 
-        return x_min, x_max, y_min, y_max, z_min, z_max, w_min, w_max
+        for n in range(0, self.dimensions):
+            min_loc = min(all_locs[n])
+            max_loc = max(all_locs[n])
+            min_max_per_dimension.append((min_loc, max_loc))
+
+        return min_max_per_dimension
 
     def grid_to_string(self):
-        x_min, x_max, y_min, y_max, z_min, z_max, w_min, w_max = self.get_size()
-        output = "current board size: x from {} to {}, y from {} to {}, z from {} to {}, w from {} to {}\n".format(
-            x_min, x_max, y_min,
-            y_max, z_min, z_max, w_min, w_max)
+        min_max_per_dimension = self.get_size()
+
+        # Extract first 2 dimensions and plot those for each of the other dimensions
+        n_range = []
+        for n in range(0, self.dimensions):
+            n_range.append(range(min_max_per_dimension[n][0], min_max_per_dimension[n][1] + 1))
+
+        output = "---------BOARD-------------\n"
+        for dim, (min, max) in enumerate(min_max_per_dimension):
+            output += f"dimension {dim} has range {min} - {max}\n"
         output += "---------------------------\n"
-        for w in range(z_min, z_max + 1):
-            for z in range(z_min, z_max + 1):
-                output += f"\nz={z} w={w}\n"
-                for y in range(y_min, y_max + 1):
-                    x_string = ""
-                    for x in range(x_min, x_max + 1):
-                        if (x, y, z, w) in self.grid.keys():
-                            x_string += self.grid[(x, y, z, w)]
-                        else:
-                            x_string += INACTIVE
-                    output += x_string
-                    output += "\n"
-        output += "---------------------------\n"
+
+        for other_dims in itertools.product(*n_range[2:]):
+            output += f"dimension {other_dims}"
+            for y in n_range[1]:
+                for x in n_range[0]:
+                    if (x, y, *other_dims) in self.grid.keys():
+                        output += self.grid[(x, y, *other_dims)]
+                    else:
+                        output += INACTIVE
+                output += "\n"
+            output += "---------------------------\n"
         return output
 
 
 def cycle(grid):
-    x_min, x_max, y_min, y_max, z_min, z_max, w_min, w_max = grid.get_size()
+    print('running cycle')
+    min_max_per_dimension = grid.get_size()
+
     # loop through grid and its edges
     changed_locs = {}
 
-    for w in range(w_min - 1, w_max + 2):
-        for z in range(z_min - 1, z_max + 2):
-            for y in range(y_min - 1, y_max + 2):
-                for x in range(x_min - 1, x_max + 2):
-                    if (x, y, z, w) in grid.grid.keys():
-                        own_symbol = grid.grid[x, y, z, w]
-                    else:
-                        own_symbol = INACTIVE
+    offsets = list(get_nd_offsets(grid.dimensions))
 
-                    active_neighbours = len(list(grid.get_direct_neighbours((x, y, z, w), ACTIVE)))
-                    if own_symbol == ACTIVE and not 2 <= active_neighbours <= 3:
-                        changed_locs[x, y, z, w] = INACTIVE
-                    if own_symbol == INACTIVE and active_neighbours == 3:
-                        changed_locs[x, y, z, w] = ACTIVE
+    n_range = []
+    for n in range(0, grid.dimensions):
+        n_range.append(range(min_max_per_dimension[n][0] - 1, min_max_per_dimension[n][1] + 2))
+
+    for option in itertools.product(*n_range):
+        if option in grid.grid.keys():
+            own_symbol = grid.grid[option]
+        else:
+            own_symbol = INACTIVE
+        # print(f"evaluating position {option} current symbol {own_symbol}")
+        active_neighbours = len(list(grid.get_direct_neighbours(option, ACTIVE, offsets)))
+        if own_symbol == ACTIVE and not 2 <= active_neighbours <= 3:
+            changed_locs[option] = INACTIVE
+        if own_symbol == INACTIVE and active_neighbours == 3:
+            changed_locs[option] = ACTIVE
 
     for loc, symbol in changed_locs.items():
+        # print(f"changed position {loc} to {symbol}")
         grid.grid[loc] = symbol
 
 
@@ -199,17 +117,18 @@ def get_active_cubes(grid):
 class Day17Tester(unittest.TestCase):
 
     def test_example_b(self):
-        grid = Grid3d()
+        grid = GridN(4)
         for y, line in enumerate(lineyielder.yield_lines_fp("./example.txt", THIS_DIR)):
             for x, char in enumerate(line):
                 grid.add_location((x, y, 0, 0), char)
 
         for _ in range(0, 6):
             cycle(grid)
+            # print(grid.grid_to_string())
         self.assertEqual(848, get_active_cubes(grid))
 
     def test_b(self):
-        grid = Grid3d()
+        grid = GridN(4)
         for y, line in enumerate(lineyielder.yield_lines_fp("./input.txt", THIS_DIR)):
             for x, char in enumerate(line):
                 grid.add_location((x, y, 0, 0), char)
@@ -219,4 +138,13 @@ class Day17Tester(unittest.TestCase):
         self.assertEqual(1972, get_active_cubes(grid))
 
     def test_permutations(self):
-        print(list(get_ND_offsets(3)))
+        print(list(get_nd_offsets(2)))
+        print(len(list(get_nd_offsets(2))))
+
+    def test_range(self):
+        ranges = []
+        ranges.append(range(0, 3))
+        ranges.append(range(0, 5))
+        ranges.append(range(0, 4))
+        for loc in itertools.product(*ranges):
+            print(loc)
