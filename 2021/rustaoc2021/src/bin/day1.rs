@@ -1,52 +1,36 @@
 use rustaoc2021::reader::parse_lines_to_vec;
-use std::fmt::Debug;
-use std::num::ParseIntError;
-use std::str::FromStr;
+use std::time::Instant;
 
-#[derive(Debug, PartialEq)]
-struct Test {
-    value: u64,
-}
-
-impl FromStr for Test {
-    type Err = ParseIntError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let value_from_str = s.parse::<u64>()?;
-        Ok(Test {
-            value: value_from_str,
-        })
-    }
-}
-
-fn main() -> std::io::Result<()> {
-    run_part_1();
-    run_part_2();
-
-    Ok(())
-}
-
-fn run_part_2() {
+fn main() {
     let input: Vec<u64> = parse_lines_to_vec("./resources/inputs/day1a-input.txt").unwrap();
-
-    let mut count = 0;
-    for index in 3..input.len() {
-        // do something with input
-        let sum_a = input[index-3] + input[index-2]+input[index-1];
-        let sum_b = input[index-2] + input[index-1]+input[index];
-
-        if sum_b>sum_a {
-            count += 1;
-        }
-    }
-    println!("part 2: {}", count);
+    run_part_1(&input);
+    run_part_2(&input);
 }
 
-fn run_part_1() {
-    let input: Vec<u64> = parse_lines_to_vec("./resources/inputs/day1a-input.txt").unwrap();
-
-    let one = &input[0..input.len()-1];
-    let other = &input[1..];
-    let result = one.iter().zip(other.iter()).filter( | (one,other)| other > one ).count();
-    println!("part 1: {}", result);
+fn run_part_1(input : &Vec<u64>) {
+    let now = Instant::now();
+    let answer = get_increases(&input, 1);
+    println!(
+        "part 1: {}, result found in {} ms",
+        answer,
+        now.elapsed().as_millis()
+    );
 }
+
+fn run_part_2(input : &Vec<u64>) {
+    let now = Instant::now();
+    let answer = get_increases(&input, 3);
+    println!(
+        "part 2: {}, result found in {} ms",
+        answer,
+        now.elapsed().as_millis()
+    );
+}
+
+fn get_increases(input: &Vec<u64>, window_size: usize) -> usize {
+    input
+        .windows(window_size + 1)
+        .filter(|window| window[window_size] > window[0])
+        .count()
+}
+
