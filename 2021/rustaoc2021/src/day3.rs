@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-fn part_1(input: &Vec<String>) -> usize {
+pub fn part_1(input: &Vec<String>) -> usize {
     let nr_map = get_counts_per_bit_position(input);
 
     let number_length = input[0].len();
@@ -22,7 +22,7 @@ fn part_1(input: &Vec<String>) -> usize {
     gamma_rate * epsilon_rate
 }
 
-fn part_2(input: &Vec<String>) -> usize {
+pub fn part_2(input: &Vec<String>) -> usize {
     let number_length = input[0].len();
 
     let life_support_rating = get_winning_number(input, number_length, true);

@@ -1,12 +1,10 @@
-use rustaoc2021::calculator::run_timed;
-use rustaoc2021::reader::parse_lines_to_vec;
 use std::str::FromStr;
 
 #[derive(Debug, PartialEq)]
-struct ParseError;
+pub struct ParseError;
 
 #[derive(Debug, PartialEq)]
-enum Command {
+pub enum Command {
     Forward(usize),
     Down(usize),
     Up(usize),
@@ -28,13 +26,7 @@ impl FromStr for Command {
     }
 }
 
-fn main() {
-    let input: Vec<Command> = parse_lines_to_vec("./resources/inputs/day2-input.txt").unwrap();
-    run_timed(part_1, &input, 1);
-    run_timed(part_2, &input, 2);
-}
-
-fn part_1(input: &Vec<Command>) -> usize {
+pub fn part_1(input: &Vec<Command>) -> usize {
     let mut horizontal = 0;
     let mut depth = 0;
 
@@ -48,7 +40,7 @@ fn part_1(input: &Vec<Command>) -> usize {
     horizontal * depth
 }
 
-fn part_2(input: &Vec<Command>) -> usize {
+pub fn part_2(input: &Vec<Command>) -> usize {
     let mut horizontal = 0;
     let mut depth = 0;
     let mut aim = 0;
@@ -68,8 +60,8 @@ fn part_2(input: &Vec<Command>) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use crate::{part_1, part_2, Command, ParseError};
-    use rustaoc2021::reader::parse_lines_to_vec;
+    use crate::day2::{part_1, part_2, Command, ParseError};
+    use crate::reader::parse_lines_to_vec;
 
     #[test]
     fn test_parser() {

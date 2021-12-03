@@ -1,17 +1,9 @@
-use rustaoc2021::reader::parse_lines_to_vec;
-use std::time::Instant;
 
-fn main() {
-    let input: Vec<u64> = parse_lines_to_vec("./resources/inputs/day1-input.txt").unwrap();
-    part_1(&input);
-    part_2(&input);
-}
-
-fn part_1(input : &Vec<u64>) -> usize {
+pub fn part_1(input : &Vec<u64>) -> usize {
     get_increases(&input, 1)
 }
 
-fn part_2(input : &Vec<u64>) -> usize {
+pub fn part_2(input : &Vec<u64>) -> usize {
     get_increases(&input, 3)
 }
 
@@ -26,8 +18,8 @@ fn get_increases(input: &Vec<u64>, window_size: usize) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use rustaoc2021::reader::parse_lines_to_vec;
-    use crate::{part_1, part_2};
+    use crate::reader::parse_lines_to_vec;
+    use crate::day1::{part_1, part_2};
 
 
     #[test]
