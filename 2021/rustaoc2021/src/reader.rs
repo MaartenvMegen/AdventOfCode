@@ -19,7 +19,7 @@ where
     Ok(vec)
 }
 
-fn get_lines(filename: &str) -> Lines<BufReader<File>> {
+pub fn get_lines(filename: &str) -> Lines<BufReader<File>> {
     let f = File::open(filename).expect("Something went wrong loading file");
     BufReader::new(f).lines()
 }
