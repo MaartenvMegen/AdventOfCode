@@ -1,12 +1,24 @@
-pub fn get_recursive_v2(seed: &mut Vec<u64>, days: u64) -> u64 {
+use std::collections::HashMap;
+
+pub fn get_recursive_cache(seed: &mut Vec<u64>, days: u64) -> u64 {
+    let mut cache: HashMap<i64, u64> = HashMap::new();
+
     seed.iter()
-        .map(|fish| get_fishes((days - fish) as i64))
+        .map(|fish| get_fishes((days - fish) as i64, &mut cache))
         .sum()
 }
 
-pub fn get_fishes(iteration: i64) -> u64 {
+pub fn get_fishes(iteration: i64, cache: &mut HashMap<i64, u64>) -> u64 {
+    let ages = vec![7,9];
+
     if iteration > 0 {
-        get_fishes(iteration - 9) + get_fishes(iteration - 7)
+        ages.iter().map( |age| { if let Some(nr) = cache.get(&(iteration - age)) {
+            *nr
+        } else {
+            let nr = get_fishes(iteration - age, cache);
+            cache.insert(iteration-age, nr);
+            nr
+        }}).sum()
     } else {
         1
     }
@@ -74,7 +86,10 @@ fn get_children(start_age: u64, current_iteration: u64, iterations: u64) -> u64 
 
 #[cfg(test)]
 mod tests {
-    use crate::day6::{get_fishes_after_x_days, get_population_recursive, get_recursive_v2, run_seed_for_x_generations};
+    use crate::day6::{
+        get_fishes_after_x_days, get_population_recursive, get_recursive_cache,
+        run_seed_for_x_generations,
+    };
 
     #[test]
     fn test_example() {
@@ -82,8 +97,9 @@ mod tests {
         //let mut seed = vec![ 3];
         assert_eq!(26, run_seed_for_x_generations(&mut seed, 18));
         assert_eq!(26, get_population_recursive(&mut seed, 18));
-        assert_eq!(26, get_recursive_v2(&mut seed, 18));
+        assert_eq!(26, get_recursive_cache(&mut seed, 18));
         assert_eq!(26, get_fishes_after_x_days(&mut seed, 18));
+        assert_eq!(26984457539, get_recursive_cache(&mut seed, 256));
 
         assert_eq!(26984457539, get_fishes_after_x_days(&mut seed, 256));
     }
@@ -104,7 +120,6 @@ mod tests {
             1, 3, 1, 1, 1, 1, 1, 1, 1, 5,
         ];
         assert_eq!(1689540415957, get_fishes_after_x_days(&mut seed, 256));
+        assert_eq!(1689540415957, get_recursive_cache(&mut seed, 256))
     }
-
-
 }
