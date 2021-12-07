@@ -24,7 +24,7 @@ pub fn get_fishes(iteration: i64, cache: &mut HashMap<i64, u64>) -> u64 {
     }
 }
 
-fn run_seed_for_x_generations(seed: &mut Vec<u64>, iterations: i32) -> usize {
+pub fn run_seed_for_x_generations(seed: &mut Vec<u64>, iterations: i32) -> usize {
     let mut seed = seed.clone();
     for _iteration in 0..iterations {
         for i in 0..seed.len() {
@@ -43,10 +43,7 @@ fn run_seed_for_x_generations(seed: &mut Vec<u64>, iterations: i32) -> usize {
 
 pub fn get_fishes_after_x_days(seed: &mut Vec<u64>, days: usize) -> u64 {
     // setup vec of zeroes
-    let mut breeders: Vec<u64> = Vec::with_capacity(9);
-    for _i in 0..9 {
-        breeders.push(0);
-    }
+    let mut breeders: Vec<u64> = vec![0; 9];
 
     // initialize with seed
     for fish_age in seed.clone() {
