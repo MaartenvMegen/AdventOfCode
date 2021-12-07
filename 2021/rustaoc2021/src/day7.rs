@@ -1,17 +1,14 @@
+use crate::calculator::{min_max};
+
 pub fn get_min_fuel_cost_part_b(input: &mut Vec<i64>) -> i64 {
-    input.sort();
-    let mut prev_cost = i64::MAX;
-    for desired_position in input[0]..input[input.len() - 1] {
+    let (min, max) = min_max(input);
+    (min..max).map( |desired_position | {
         // calculate fuelcost
-        let cost = input
+        input
             .iter()
             .map(|position| sum_int((position - desired_position).abs()))
-            .sum();
-        if cost < prev_cost {
-            prev_cost = cost;
-        }
-    }
-    prev_cost
+            .sum()
+    }).min().unwrap()
 }
 
 pub fn get_min_fuel_cost_part_a(input: &mut Vec<i64>) -> i64 {
@@ -37,6 +34,7 @@ fn sum_int(n: i64) -> i64 {
 #[cfg(test)]
 mod tests {
     use crate::day7::{get_min_fuel_cost_part_a, get_min_fuel_cost_part_b, sum_int};
+
 
     #[test]
     fn test_example() {
