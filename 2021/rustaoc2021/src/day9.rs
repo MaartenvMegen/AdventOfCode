@@ -1,3 +1,5 @@
+
+
 #[cfg(test)]
 mod tests {
     use std::collections::HashSet;
@@ -10,7 +12,7 @@ mod tests {
     #[test]
     fn test_part1() {
         let input = get_lines("./resources/inputs/day9-input.txt");
-        let mut grid = parse_to_grid(input);
+        let grid = parse_to_grid(input);
         //grid.print_grid();
         let low_values = get_low_values(grid);
         let answer: u64 = low_values.iter().sum::<u64>() + low_values.len() as u64;
@@ -20,7 +22,7 @@ mod tests {
     #[test]
     fn test_part2_example() {
         let input = get_lines("./resources/inputs/day9-example.txt");
-        let mut grid = parse_to_grid(input);
+        let grid = parse_to_grid(input);
         //grid.print_grid();
         let basins = get_basins(grid);
         let answer = get_answer(basins);
@@ -31,7 +33,7 @@ mod tests {
     #[test]
     fn test_part2_input() {
         let input = get_lines("./resources/inputs/day9-input.txt");
-        let mut grid = parse_to_grid(input);
+        let grid = parse_to_grid(input);
         //grid.print_grid();
         let basins = get_basins(grid);
         let answer = get_answer(basins);
