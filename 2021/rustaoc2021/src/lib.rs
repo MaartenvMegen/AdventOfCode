@@ -11,3 +11,4 @@ pub mod day8;
 pub mod day9;
 pub mod grid;
 pub mod day10;
+pub mod day11;

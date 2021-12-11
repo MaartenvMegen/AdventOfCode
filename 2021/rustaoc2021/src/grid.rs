@@ -49,6 +49,19 @@ impl Grid {
         }
     }
 
+    pub fn increment_loc(&mut self, loc : &Point, increment : u64) {
+        let mut value = self.map.get_mut(loc).unwrap();
+        *value += increment
+    }
+
+    pub fn update_loc(&mut self, loc : Point, value : u64) {
+        self.map.insert(loc, value);
+    }
+
+    pub fn get_locations(&self) -> Vec<Point> {
+        self.map.keys().map(|x| x.clone()).collect::<Vec<Point>>()
+    }
+
     pub fn get_map(&self) -> &HashMap<Point, u64>{
         &self.map
     }
@@ -117,6 +130,16 @@ impl Grid {
 
     pub fn get_neighbours(&self, point: &Point) -> Vec<Point> {
         let offsets = vec![(1, 0), (-1, 0), (0, 1), (0, -1)];
+
+        offsets
+            .iter()
+            .map(|(x_off, y_off)| Point::new(point.x + x_off, point.y + y_off))
+            .filter(|neighbour| self.map.contains_key(neighbour))
+            .collect()
+    }
+
+    pub fn get_neighbours_diag(&self, point: &Point) -> Vec<Point> {
+        let offsets = vec![(1, 0), (-1, 0), (0, 1), (0, -1), (1,1), (-1, -1), (1,-1), (-1,1)];
 
         offsets
             .iter()

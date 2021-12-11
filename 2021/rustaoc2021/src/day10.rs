@@ -2,12 +2,12 @@ use crate::reader::get_lines;
 
 #[derive(Debug)]
 enum Error {
-    UNMATCHED(char, char),
-    MISSING(Vec<char>),
+    Unmatched(char, char),
+    Missing(Vec<char>),
 }
 
 fn get_error_score_for_line(line: &str) -> Option<u64> {
-    if let Err(Error::UNMATCHED(expected, _found)) = parse_line(line) {
+    if let Err(Error::Unmatched(expected, _found)) = parse_line(line) {
         match expected {
             '>' => Some(25137),
             '}' => Some(1197),
@@ -21,7 +21,7 @@ fn get_error_score_for_line(line: &str) -> Option<u64> {
 }
 
 fn get_missing_score_for_line(line: &str) -> Option<u64> {
-    if let Err(Error::MISSING(mut chars)) = parse_line(line) {
+    if let Err(Error::Missing(mut chars)) = parse_line(line) {
         chars.reverse();
         return Some(chars.iter().fold(0, |score, character| {
             let points: u64 = match character {
@@ -34,12 +34,12 @@ fn get_missing_score_for_line(line: &str) -> Option<u64> {
             score * 5 + points
         }));
     }
-    return None;
+    None
 }
 
 fn parse_line(line: &str) -> Result<bool, Error> {
     let mut stack = Vec::new();
-    for char in line.chars().collect() {
+    for char in line.chars().collect::<Vec<char>>() {
         match char {
             '(' => stack.push(')'),
             '{' => stack.push('}'),
@@ -48,7 +48,7 @@ fn parse_line(line: &str) -> Result<bool, Error> {
             ')' | ']' | '}' | '>' => {
                 if let Some(expected) = stack.pop() {
                     if char != expected {
-                        return Err(Error::UNMATCHED(char, expected));
+                        return Err(Error::Unmatched(char, expected));
                     }
                 }
             }
@@ -58,18 +58,18 @@ fn parse_line(line: &str) -> Result<bool, Error> {
     if stack.is_empty() {
         Ok(true)
     } else {
-        Err(Error::MISSING(stack))
+        Err(Error::Missing(stack))
     }
 }
 
-fn part_1(filename: &str) -> u64 {
+pub fn part_1(filename: &str) -> u64 {
     get_lines(filename)
         .flatten()
         .filter_map(|line| get_error_score_for_line(&line))
         .sum()
 }
 
-fn part_2(filename: &str) -> u64 {
+pub fn part_2(filename: &str) -> u64 {
     let mut scores: Vec<u64> = get_lines(filename)
         .flatten()
         .map(|line| get_missing_score_for_line(&line))
@@ -89,10 +89,10 @@ mod tests {
     #[test]
     fn test_parse_line() {
         let line = "{([(<{}[<>[]}>{[]{[(<()>";
-        assert!(matches!(parse_line(line), Err(Error::UNMATCHED(_, _))));
+        assert!(matches!(parse_line(line), Err(Error::Unmatched(_, _))));
 
         let line = "[({(<(())[]>[[{[]{<()<>>";
-        assert!(matches!(parse_line(line), Err(Error::MISSING(_))));
+        assert!(matches!(parse_line(line), Err(Error::Missing(_))));
 
         let line = "<>";
         assert!(matches!(parse_line(line), Ok(true)));
