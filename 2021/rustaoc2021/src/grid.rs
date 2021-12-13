@@ -21,11 +21,11 @@ impl Display for Point {
     }
 }
 
-fn get_distance(p1 : &Point, p2: &Point) -> isize {
-    let x_dist = (p1.x - p2.x).abs();
-    let y_dist = (p1.y - p2.y).abs();
-    x_dist + y_dist
-}
+// fn get_distance(p1 : &Point, p2: &Point) -> isize {
+//     let x_dist = (p1.x - p2.x).abs();
+//     let y_dist = (p1.y - p2.y).abs();
+//     x_dist + y_dist
+// }
 
 pub struct Grid {
     // hashmap backed grid class where top left is ymax, xmin and bottom right is ymin, xmax
@@ -50,7 +50,7 @@ impl Grid {
     }
 
     pub fn increment_loc(&mut self, loc : &Point, increment : u64) {
-        let mut value = self.map.get_mut(loc).unwrap();
+        let value = self.map.get_mut(loc).unwrap();
         *value += increment
     }
 

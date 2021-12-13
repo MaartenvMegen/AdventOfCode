@@ -60,11 +60,11 @@ fn perform_round(mut grid: &mut Grid) -> HashSet<Point> {
     let mut sparked: HashSet<Point> = HashSet::new();
 
     loop {
-        let mut new_sparks: HashSet<Point> = HashSet::from_iter(
+        let new_sparks: HashSet<Point> = HashSet::from_iter(
             grid.get_map()
                 .iter()
-                .filter(|(k, v)| v > &&(9 as u64))
-                .map(|(key, value)| key)
+                .filter(|(_k, v)| v > &&(9 as u64))
+                .map(|(key, _value)| key)
                 .filter(|point| !sparked.contains(*point))
                 .cloned()
                 .collect::<Vec<Point>>(),
@@ -75,7 +75,7 @@ fn perform_round(mut grid: &mut Grid) -> HashSet<Point> {
         }
 
         // each loc can occur multiple times
-        let mut incrementable_locs = new_sparks
+        let incrementable_locs = new_sparks
             .iter()
             .map(|loc| grid.get_neighbours_diag(loc))
             .flatten()
@@ -106,7 +106,6 @@ fn increment(grid: &mut Grid) {
 #[cfg(test)]
 mod tests {
     use crate::day11::{part_1, part_2};
-    use crate::reader::get_lines;
 
     #[test]
     fn test_part1() {
