@@ -23,7 +23,7 @@ fn parse_to_grid(input: Lines<BufReader<File>>) -> Grid {
     grid
 }
 
-fn part_1(filename: &str) -> usize {
+pub fn part_1(filename: &str) -> usize {
     let input = get_lines(filename);
     let mut grid = parse_to_grid(input);
 
@@ -37,7 +37,7 @@ fn part_1(filename: &str) -> usize {
     total
 }
 
-fn part_2(filename: &str) -> usize {
+pub fn part_2(filename: &str) -> usize {
     let input = get_lines(filename);
     let mut grid = parse_to_grid(input);
 

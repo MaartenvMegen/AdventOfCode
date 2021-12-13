@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 use std::iter::FromIterator;
 
-fn part_1(input: &str) -> usize {
+pub fn part_1(input: &str) -> usize {
     let parts: Vec<&str> = input.split("\n\n").collect();
     let mut dots: HashSet<(u64, u64)> = parts[0]
         .trim()
@@ -22,7 +22,7 @@ fn part_1(input: &str) -> usize {
     dots.len()
 }
 
-fn part_2(input: &str) -> usize {
+pub fn part_2(input: &str) -> usize {
     let parts: Vec<&str> = input.split("\n\n").collect();
     let mut dots: HashSet<(u64, u64)> = parts[0]
         .trim()
@@ -133,6 +133,8 @@ mod tests {
 
     #[test]
     fn test_part2() {
+        let input1 = include_str!(r"../resources/inputs/day13-example.txt");
+        assert_eq!(16,part_2(input1));
         let input2 = include_str!(r"../resources/inputs/day13-input.txt");
         assert_eq!(99,part_2(input2));
     }
