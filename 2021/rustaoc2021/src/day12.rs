@@ -1,5 +1,7 @@
 use crate::reader::get_lines;
 use std::collections::{HashMap, HashSet};
+use std::fs::File;
+use std::io::{BufReader, Lines};
 
 
 pub fn part_1(filename: &str) -> usize {
@@ -12,8 +14,16 @@ pub fn part_2(filename: &str) -> usize {
 
 fn get_paths(filename: &str, allow_revisits : bool) -> usize {
     let lines = get_lines(filename);
-    // map node to other nodes
 
+    let maze = parse_maze(lines);
+
+    let visited_nodes: HashSet<&str> = HashSet::new();
+    let paths = maze.find_paths_from_node( "start", visited_nodes, true, allow_revisits);
+    let nr_paths: usize = paths.len();
+    nr_paths
+}
+
+fn parse_maze(lines: Lines<BufReader<File>>) -> Maze {
     let mut graph: HashMap<String, Vec<String>> = HashMap::new();
     for line in lines {
         let line = line.unwrap();
@@ -32,25 +42,17 @@ fn get_paths(filename: &str, allow_revisits : bool) -> usize {
             small_caves.insert(node.clone());
         }
     }
-    let maze = Maze { small_caves };
-
-    //println!("{:?}", graph);
-    let visited_nodes: HashSet<&str> = HashSet::new();
-    let paths = maze.find_paths_from_node(&graph, "start", visited_nodes, true, allow_revisits);
-    let nr_paths: usize = paths.len();
-    nr_paths
+    let maze = Maze { small_caves, cave_layout: graph };
+    maze
 }
 
 struct Maze {
-    small_caves : HashSet<String>
+    small_caves : HashSet<String>,
+    cave_layout : HashMap<String, Vec<String>>
 }
 
 impl Maze {
-
-    fn find_paths_from_node<'a>(&self, graph: &'a HashMap<String, Vec<String>>, node:  &'a str, mut visited_caves: HashSet<&'a str>, free_pass: bool, allow_revisit : bool) -> Vec<Vec<&'a str>> {
-        // add itself to every path found on a lower level
-        let mut paths_found : Vec<Vec<&str>> = Vec::new();
-
+    fn find_paths_from_node<'a>(&'a self, node:  &'a str, mut visited_caves: HashSet<&'a str>, free_pass: bool, allow_revisit : bool) -> Vec<Vec<&'a str>> {
         if node == "end" {
             return vec![vec!["end"]]
         }
@@ -59,7 +61,8 @@ impl Maze {
             visited_caves.insert(node);
         }
 
-        for node in graph.get(&*node).unwrap() {
+        let mut paths_found : Vec<Vec<&str>> = Vec::new();
+        for node in self.cave_layout.get(&*node).unwrap() {
             if node != "start" && (!visited_caves.contains(&**node) || (free_pass && allow_revisit)) {
                 // this clone needs to be here to make sure we don't infect other paths
                 let mut free_pass = free_pass.clone();
@@ -69,7 +72,7 @@ impl Maze {
                 if visited_caves.contains(&**node) {
                     free_pass = false;
                 }
-                let mut paths = self.find_paths_from_node(graph, node, caves, free_pass, allow_revisit);
+                let mut paths = self.find_paths_from_node(node, caves, free_pass, allow_revisit);
                 // add current node to paths found from the next node
                 for path in &mut paths {
                     path.push(node)
