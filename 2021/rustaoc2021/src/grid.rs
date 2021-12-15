@@ -3,7 +3,7 @@ use std::fmt;
 use std::fmt::{Display, Formatter};
 use std::ops::Add;
 
-#[derive(Debug, Eq, PartialEq, Hash, Clone)]
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub struct Point {
     x: isize,
     y: isize,
@@ -32,11 +32,13 @@ pub struct Grid {
     // this type is useful for sparse grids, dense grids are more efficiently approached using
     // a vector based grid
     map: HashMap<Point, u64>,
-    xmax: isize,
-    ymax: isize,
+    pub xmax: isize,
+    pub ymax: isize,
     ymin: isize,
     xmin: isize,
 }
+
+
 
 impl Grid {
     pub(crate) fn new() -> Self {
@@ -135,6 +137,17 @@ impl Grid {
             .iter()
             .map(|(x_off, y_off)| Point::new(point.x + x_off, point.y + y_off))
             .filter(|neighbour| self.map.contains_key(neighbour))
+            .collect()
+    }
+
+    pub fn get_neighbour_key_value(&self, point: &Point) -> Vec<(Point, u64)> {
+        let offsets = vec![(1, 0), (-1, 0), (0, 1), (0, -1)];
+
+        offsets
+            .iter()
+            .map(|(x_off, y_off)| Point::new(point.x + x_off, point.y + y_off))
+            .filter(|neighbour| self.map.contains_key(neighbour))
+            .map(|neighbour| (neighbour, *self.map.get(&neighbour).unwrap()))
             .collect()
     }
 

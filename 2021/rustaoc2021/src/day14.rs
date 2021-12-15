@@ -3,15 +3,15 @@ use std::iter::once;
 use crate::day13::min_max;
 
 pub fn run_day_14(input: &str, rounds : u64) -> usize {
-    // parse input
     let (template, insert_lookup) = parse_input(input);
-
     let char_counts = perform_insertion_rounds(rounds, &template, insert_lookup);
+    get_answer(char_counts)
+}
 
-    // calculate answer
-    let min = char_counts.iter().map( | (k, v)| v).min().unwrap();
-    let max = char_counts.iter().map( | (k, v)| v).max().unwrap();
-    (max-min) as usize
+fn get_answer(char_counts: HashMap<&str, u64>) -> usize {
+    let min = char_counts.iter().map(|(k, v)| v).min().unwrap();
+    let max = char_counts.iter().map(|(k, v)| v).max().unwrap();
+    (max - min) as usize
 }
 
 fn parse_input(input: &str) -> (Vec<&str>, HashMap<(&str, &str), &str>) {
