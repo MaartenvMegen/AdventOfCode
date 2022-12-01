@@ -1,13 +1,13 @@
 use std::str::FromStr;
 
 fn day1_part1(input: &str) -> u64 {
-    let parts: Vec<&str> = create_chunks(input);
+    let parts: Vec<&str> = rustaoc2022::create_chunks(input);
     let calories_per_elf: Vec<u64> = get_calories_per_elf(parts);
     calories_per_elf.into_iter().max().unwrap()
 }
 
 fn day1_part2(input : &str) -> u64 {
-    let parts: Vec<&str> = create_chunks(input);
+    let parts: Vec<&str> = rustaoc2022::create_chunks(input);
     let mut calories_per_elf: Vec<u64> = get_calories_per_elf(parts);
     three_heighest_elf_sum(&mut calories_per_elf)
 }
@@ -19,10 +19,6 @@ fn three_heighest_elf_sum(calories_per_elf: &mut Vec<u64>) -> u64 {
 
 fn get_total_calories_per_elf(chunk: &str) -> u64 {
     chunk.split("\n").map(|value | u64::from_str(value).unwrap()).sum()
-}
-
-fn create_chunks(input: &str) -> Vec<&str> {
-    input.trim().split("\n\n").collect()
 }
 
 fn get_calories_per_elf(parts: Vec<&str>) -> Vec<u64> {
@@ -42,8 +38,9 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
-    use crate::bin::day1::{get_total_calories_per_elf, create_chunks, get_calories_per_elf, day1_part1};
-    use crate::{create_chunks, day1_part1, get_calories_per_elf};
+    use rust::create_chunks;
+    use crate::bin::day1::{create_chunks, day1_part1, get_calories_per_elf, get_total_calories_per_elf};
+    use crate::{day1_part1, get_calories_per_elf};
 
     #[test]
     fn test_digits() {
