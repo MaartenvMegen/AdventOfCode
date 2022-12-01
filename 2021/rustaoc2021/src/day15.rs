@@ -5,25 +5,33 @@ use std::io::{BufReader, Lines};
 use std::str::FromStr;
 
 pub fn part_1(input: &str) -> usize {
-    let grid = parse_to_grid(input);
+    let mut grid = parse_to_grid(input);
     println!("search for distance from 0,0 to {} {}", grid.xmax, grid.ymax);
     let start = Point::new(0, 0);
     let end = Point::new(grid.xmax, grid.ymax);
 
-    // perform search through grid
+    run_dijkstra(&mut grid, start, end)
+}
 
-    // keep track of visited nodes
-    // keep track of "distances" to each node
-    // initialize this map with maximum values for the integer used
+pub fn part_2(input: &str) -> usize {
+    let mut grid = parse_to_grid_x5(input);
+    println!("search for distance from 0,0 to {} {}", grid.xmax, grid.ymax);
+    let start = Point::new(0, 0);
+    let end = Point::new(grid.xmax, grid.ymax);
+
+    run_dijkstra(&mut grid, start, end)
+}
+
+fn run_dijkstra(grid: &mut Grid, start: Point, end: Point) -> usize {
+// initialize everything at max distance
     let mut distances: HashMap<Point, u64> = HashMap::new();
+    // for point in grid.get_map().keys().copied() {
+    //     distances.insert(point, u64::MAX);
+    // }
+    //grid.print_grid();
 
-    for point in grid.get_map().keys().copied() {
-        distances.insert(point, u64::MAX);
-    }
-
-    let mut visited_points: HashSet<Point> = HashSet::new();
     // initialize for start
-    let start_value = grid.get_map().get(&start).unwrap();
+    let mut visited_points: HashSet<Point> = HashSet::new();
     distances.insert(start, 0);
 
     // now loop until condition is satisfied
@@ -32,22 +40,22 @@ pub fn part_1(input: &str) -> usize {
 
     loop {
         //println!("current node is: {}, current distance: {}", current_node, current_node_distance);
-
         grid
             .get_neighbour_key_value(&current_node)
             .iter()
-            .filter(|(neighbour, _weight)| !visited_points.contains(neighbour))
             .for_each(|(neighbour, weight)| {
-                let mut current_neighour_distance = distances.get_mut(neighbour).unwrap();
+                let mut current_neighour_distance = distances.entry(*neighbour).or_insert(u64::MAX);
                 if weight + current_node_distance < *current_neighour_distance {
                     *current_neighour_distance = weight + current_node_distance;
                 }
             });
 
         visited_points.insert(current_node);
+        distances.remove(&current_node);
+        grid.remove_loc(&current_node);
 
-        let mut scores : Vec<(Point, u64)> = distances.iter().filter(|(point, value)| !visited_points.contains(point)).map( | (key, value)| (*key, *value)).collect();
-        scores.sort_by(|(a,b), (c,d)| b.cmp(d));
+        let mut scores: Vec<(Point, u64)> = distances.iter().map(|(key, value)| (*key, *value)).collect();
+        scores.sort_by(|(a, b), (c, d)| b.cmp(d));
 
         let (node, distance, ) = scores[0];
         current_node = node;
@@ -76,9 +84,37 @@ fn parse_to_grid(input: &str) -> Grid {
     grid
 }
 
+fn parse_to_grid_x5(input: &str) -> Grid {
+    let mut grid = Grid::new();
+    for (y, line) in input.split("\n").enumerate() {
+        //println!("{:?}", line.clone().trim().chars().collect::<Vec<char>>());
+        for (x, nr) in line
+            .trim()
+            .chars()
+            .map(|s| u64::from_str(&*s.to_string()).unwrap())
+            .enumerate()
+        {
+            grid.add_to_grid(Point::new(x as isize, y as isize), nr);
+            let grid_size = line.len()-1;
+            for n_x in 0..5 {
+                for n_y in 0..5 {
+                    if n_x != 0 || n_y != 0 {
+                        let new_x = n_x*grid_size+x;
+                        let new_y = n_y*grid_size+y;
+                        let new_nr = 1+ ((nr-1+n_x as u64 +n_y as u64) % 9);
+                        grid.add_to_grid(Point::new(new_x as isize, new_y as isize ), new_nr);
+                    }
+
+                }
+            }
+        }
+    }
+    grid
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::day15::part_1;
+    use crate::day15::{part_1, part_2};
 
     #[test]
     fn test_part_1_example() {
@@ -87,8 +123,20 @@ mod tests {
     }
 
     #[test]
+    fn test_part_2_example() {
+        let input = include_str!(r"../resources/inputs/day15-example.txt");
+        assert_eq!(315, part_2(input));
+    }
+
+    #[test]
     fn test_part1_input() {
         let input2 = include_str!(r"../resources/inputs/day15-input.txt");
-        assert_eq!(0, part_1(input2));
+        assert_eq!(398, part_1(input2));
+    }
+
+    #[test]
+    fn test_part2_input() {
+        let input2 = include_str!(r"../resources/inputs/day15-input.txt");
+        assert_eq!(398, part_2(input2));
     }
 }

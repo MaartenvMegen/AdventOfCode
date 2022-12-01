@@ -51,6 +51,10 @@ impl Grid {
         }
     }
 
+    pub fn remove_loc(&mut self, loc: &Point) {
+        self.map.remove(loc);
+    }
+
     pub fn increment_loc(&mut self, loc : &Point, increment : u64) {
         let value = self.map.get_mut(loc).unwrap();
         *value += increment
