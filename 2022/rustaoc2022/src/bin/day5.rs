@@ -4,12 +4,51 @@ use std::collections::HashMap;
 use std::str::FromStr;
 
 fn part1(input: &str) -> String {
-    move_parts(input, true)
+    let mut parts = input.trim_end().split("\n\n");
+    let starting_stack = parts.next().unwrap();
+    let instructions = parts.next().unwrap();
+    let mut stacks = build_stacks(starting_stack);
+
+    instructions.split("\n").for_each(|line| {
+        let (amount, origin, destination) = parse_instruction(line);
+        perform_action_part1(&mut stacks, amount, &origin, &destination);
+    });
+
+    calculate_output(stacks)
 }
 
-fn move_parts(input: &str, part1: bool) -> String {
-    let parts: Vec<&str> = input.trim_end().split("\n\n").collect();
-    let mut stack_spec: Vec<&str> = parts[0].split("\n").collect();
+fn part2(input: &str) -> String {
+    let mut parts = input.trim_end().split("\n\n");
+    let starting_stack = parts.next().unwrap();
+    let instructions = parts.next().unwrap();
+    let mut stacks = build_stacks(starting_stack);
+
+    instructions.split("\n").for_each(|line| {
+        let (amount, origin, destination) = parse_instruction(line);
+        perform_action_part2(&mut stacks, amount, &origin, &destination);
+    });
+
+    calculate_output(stacks)
+}
+
+fn calculate_output(mut stacks: HashMap<usize, Vec<String>>) -> String {
+    let mut output = String::new();
+    for index in 1..stacks.len() + 1 {
+        output.push_str(stacks.get_mut(&index).unwrap().pop().unwrap().as_str());
+    }
+    output
+}
+
+fn parse_instruction(line: &str) -> (u64, usize, usize) {
+    let instruction: Vec<&str> = line.split(" ").skip(1).step_by(2).collect();
+    let amount = u64::from_str(instruction[0]).unwrap();
+    let origin = usize::from_str_radix(instruction[1], 10).unwrap();
+    let destination = usize::from_str_radix(instruction[2], 10).unwrap();
+    (amount, origin, destination)
+}
+
+fn build_stacks(starting_stack: &str) -> HashMap<usize, Vec<String>> {
+    let mut stack_spec: Vec<&str> = starting_stack.split("\n").collect();
     stack_spec.reverse();
     let mut stacks: HashMap<usize, Vec<String>> = HashMap::new();
     for (index, line) in stack_spec.iter().enumerate() {
@@ -32,25 +71,7 @@ fn move_parts(input: &str, part1: bool) -> String {
                 });
         }
     }
-
-    parts[1].split("\n").for_each(|line| {
-        let instruction: Vec<&str> = line.split(" ").skip(1).step_by(2).collect();
-        let amount = u64::from_str(instruction[0]).unwrap();
-        let origin = usize::from_str_radix(instruction[1], 10).unwrap();
-        let destination = usize::from_str_radix(instruction[2], 10).unwrap();
-        if part1 {
-            perform_action_part1(&mut stacks, amount, &origin, &destination);
-        } else {
-            perform_action_part2(&mut stacks, amount, &origin, &destination);
-        }
-    });
-
-    let mut output = String::new();
-    for index in 1..stacks.len() + 1 {
-        output.push_str(stacks.get_mut(&index).unwrap().pop().unwrap().as_str());
-    }
-    println!("{:?}", output);
-    output
+    stacks
 }
 
 fn perform_action_part2(
@@ -77,9 +98,6 @@ fn perform_action_part1(
     }
 }
 
-fn part2(input: &str) -> String {
-    move_parts(input, false)
-}
 
 fn main() {
     let example = include_str!(r"../../resources/day5-example.txt");
