@@ -4,31 +4,31 @@ use std::collections::HashMap;
 use std::str::FromStr;
 
 fn part1(input: &str) -> String {
-    let mut parts = input.trim_end().split("\n\n");
-    let starting_stack = parts.next().unwrap();
-    let instructions = parts.next().unwrap();
-    let mut stacks = build_stacks(starting_stack);
-
-    instructions.split("\n").for_each(|line| {
-        let (amount, origin, destination) = parse_instruction(line);
-        perform_action_part1(&mut stacks, amount, &origin, &destination);
-    });
-
+    let (instructions, mut stacks) = get_stacks_and_instructions(input);
+    parse_command_and_execute(perform_action_part1, instructions, &mut stacks);
     calculate_output(stacks)
 }
 
 fn part2(input: &str) -> String {
+    let (instructions, mut stacks) = get_stacks_and_instructions(input);
+    parse_command_and_execute(perform_action_part2, instructions, &mut stacks);
+    calculate_output(stacks)
+}
+
+fn get_stacks_and_instructions(input: &str) -> (&str, HashMap<usize, Vec<String>>) {
     let mut parts = input.trim_end().split("\n\n");
     let starting_stack = parts.next().unwrap();
     let instructions = parts.next().unwrap();
-    let mut stacks = build_stacks(starting_stack);
 
+    let stacks = build_stacks(starting_stack);
+    (instructions, stacks)
+}
+
+fn parse_command_and_execute(command: fn(&mut HashMap<usize, Vec<String>>, u64, &usize, &usize), instructions: &str, mut stacks: &mut HashMap<usize, Vec<String>>) {
     instructions.split("\n").for_each(|line| {
         let (amount, origin, destination) = parse_instruction(line);
-        perform_action_part2(&mut stacks, amount, &origin, &destination);
+        command(&mut stacks, amount, &origin, &destination);
     });
-
-    calculate_output(stacks)
 }
 
 fn calculate_output(mut stacks: HashMap<usize, Vec<String>>) -> String {
