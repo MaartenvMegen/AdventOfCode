@@ -1,4 +1,3 @@
-use rustaoc2022::run_timed;
 use std::str::FromStr;
 
 fn part1(input: &str) -> u64 {
@@ -33,10 +32,7 @@ fn get_calories_per_elf(parts: Vec<&str>) -> Vec<u64> {
 fn main() {
     let example = include_str!(r"../../resources/day1-example.txt");
     let input = include_str!(r"../../resources/day1-input.txt");
-    run_timed(part1, example, "part 1 example");
-    run_timed(part1, input, "part 1 input");
-    run_timed(part2, example, "part 2 example");
-    run_timed(part2, input, "part 2 input");
+    rustaoc2022::run_matrix(part1, part2, example, input);
 }
 
 #[cfg(test)]
