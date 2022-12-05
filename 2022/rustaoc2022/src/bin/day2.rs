@@ -1,5 +1,4 @@
 extern crate core;
-
 fn map_symbol_to_value(symbol: &str) -> u64 {
     match symbol {
         "A" | "X" => 0,
