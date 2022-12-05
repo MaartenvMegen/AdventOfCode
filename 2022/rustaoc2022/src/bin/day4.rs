@@ -7,17 +7,13 @@ fn part1(input: &str) -> u64 {
     input
         .trim()
         .split("\n")
-        .map(|line| {
-            let sector_spec = get_sectors_from_line(line);
-
-            return if sector_spec[0].is_subset(&sector_spec[1]) {
-                1
-            } else if sector_spec[1].is_subset(&sector_spec[0]) {
-                1
-            } else {
-                0
-            };
-        }).sum()
+        .map(|line|
+            get_sectors_from_line(line)
+        )
+        .filter(|(sector1, sector2)|
+            sector1.is_subset(&sector2) || sector2.is_subset(&sector1)
+        )
+        .count() as u64
 }
 
 fn get_sectors_from_line(line: &str) -> (HashSet<u64>, HashSet<u64>) {
@@ -34,15 +30,14 @@ fn get_sectors_from_line(line: &str) -> (HashSet<u64>, HashSet<u64>) {
 }
 
 fn part2(input: &str) -> u64 {
-    input.trim().split("\n").map(|line| {
-        let sector_specs = get_sectors_from_line(line);
-        let overlap = sector_specs[0].intersection(&sector_specs[1]).collect::<Vec<&u64>>();
-        return if overlap.len() > 0 {
-            1
-        } else {
-            0
-        };
-    }).c()
+    input
+        .trim()
+        .split("\n")
+        .map(|line| {
+            get_sectors_from_line(line)
+        })
+        .filter(|(sector1, sector2)| !sector2.is_disjoint(&sector1))
+        .count() as u64
 }
 
 fn main() {
