@@ -21,9 +21,9 @@ where
     );
 }
 
-pub fn run_matrix<T: ?Sized, X>(part1: fn(&T) -> X, part2: fn(&T) -> u64, example:&T, input:&T)
-    where
-        X: Debug,
+pub fn run_matrix<T: ?Sized, X>(part1: fn(&T) -> X, part2: fn(&T) -> X, example: &T, input: &T)
+where
+    X: Debug,
 {
     run_timed(part1, example, "part 1 example");
     run_timed(part1, input, "part 1 input");

@@ -4,44 +4,52 @@ fn map_symbol_to_value(symbol: &str) -> u64 {
         "A" | "X" => 0,
         "B" | "Y" => 1,
         "C" | "Z" => 2,
-        _ => panic!("unexpected symbol")
+        _ => panic!("unexpected symbol"),
     }
 }
 
-fn calculate_score(other : u64, own : u64) -> u64 {
-    let win_score = (other as i64 - own as i64 ) % 3;
+fn calculate_score(other: u64, own: u64) -> u64 {
+    let win_score = (other as i64 - own as i64) % 3;
     let win_score = match win_score {
         1 | -2 => 0,
         2 | -1 => 6,
         0 => 3,
-        _ => panic!("unexpected score: {}", win_score)
+        _ => panic!("unexpected score: {}", win_score),
     };
     win_score + own + 1
 }
 
-fn map_goal_to_num(goal : &str , other_hand : u64 ) -> u64 {
+fn map_goal_to_num(goal: &str, other_hand: u64) -> u64 {
     // stupid +3 offset because negative values have negative remainder
     match goal {
-        "X" => (other_hand + 2 ) % 3,
+        "X" => (other_hand + 2) % 3,
         "Y" => other_hand,
-        "Z" => (other_hand + 4 ) % 3,
-        _ => panic!("unexpected goal: {}", goal)
+        "Z" => (other_hand + 4) % 3,
+        _ => panic!("unexpected goal: {}", goal),
     }
 }
 
 fn part1(input: &str) -> u64 {
-    input.trim().split("\n").map( |line | {
-        let pairs : Vec<u64> = line.split(" ").map(map_symbol_to_value).take(2).collect();
-        calculate_score(pairs[0], pairs[1])
-    }).sum()
+    input
+        .trim()
+        .split("\n")
+        .map(|line| {
+            let pairs: Vec<u64> = line.split(" ").map(map_symbol_to_value).take(2).collect();
+            calculate_score(pairs[0], pairs[1])
+        })
+        .sum()
 }
 
 fn part2(input: &str) -> u64 {
-    input.trim().split("\n").map( |line | {
-        let pairs : Vec<&str> = line.split(" ").take(2).collect();
-        let other = map_symbol_to_value(pairs[0]);
-        calculate_score(other, map_goal_to_num(pairs[1], other))
-    }).sum()
+    input
+        .trim()
+        .split("\n")
+        .map(|line| {
+            let pairs: Vec<&str> = line.split(" ").take(2).collect();
+            let other = map_symbol_to_value(pairs[0]);
+            calculate_score(other, map_goal_to_num(pairs[1], other))
+        })
+        .sum()
 }
 
 fn main() {

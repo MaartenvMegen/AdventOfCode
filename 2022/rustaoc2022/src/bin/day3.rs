@@ -3,31 +3,39 @@ extern crate core;
 use std::collections::HashSet;
 
 fn part1(input: &str) -> u64 {
-    input.trim().split("\n").map( |line | {
-        let (first, second) = line.split_at(line.len()/2);
-        let first : HashSet<char> = HashSet::from_iter(first.chars());
-        let second : HashSet<char> = HashSet::from_iter(second.chars());
-        let char = first.intersection(&second).next().unwrap();
-        match char.is_ascii_lowercase() {
-            true => *char as u64 - 96,
-            false => *char as u64 - 64 + 26,
-        }
-    }).sum()
+    input
+        .trim()
+        .split("\n")
+        .map(|line| {
+            let (first, second) = line.split_at(line.len() / 2);
+            let first: HashSet<char> = HashSet::from_iter(first.chars());
+            let second: HashSet<char> = HashSet::from_iter(second.chars());
+            let char = first.intersection(&second).next().unwrap();
+            match char.is_ascii_lowercase() {
+                true => *char as u64 - 96,
+                false => *char as u64 - 64 + 26,
+            }
+        })
+        .sum()
 }
 
 fn part2(input: &str) -> u64 {
-    let backpacks : Vec<&str>= input.trim().lines().collect();
-    backpacks.windows(3).step_by(3).map( |pair | {
-        let first : HashSet<char> = HashSet::from_iter(pair[0].chars());
-        let second : HashSet<char> = HashSet::from_iter(pair[1].chars());
-        let overlap1 : HashSet<char> = first.intersection(&second).map( |char| *char ).collect();
-        let third : HashSet<char> = HashSet::from_iter(pair[2].chars());
-        let char  = third.intersection(&overlap1).next().unwrap();
-        match char.is_ascii_lowercase() {
-            true => *char as u64 - 96,
-            false => *char as u64 - 64 + 26,
-        }
-    }).sum()
+    let backpacks: Vec<&str> = input.trim().lines().collect();
+    backpacks
+        .windows(3)
+        .step_by(3)
+        .map(|pair| {
+            let first: HashSet<char> = HashSet::from_iter(pair[0].chars());
+            let second: HashSet<char> = HashSet::from_iter(pair[1].chars());
+            let overlap1: HashSet<char> = first.intersection(&second).map(|char| *char).collect();
+            let third: HashSet<char> = HashSet::from_iter(pair[2].chars());
+            let char = third.intersection(&overlap1).next().unwrap();
+            match char.is_ascii_lowercase() {
+                true => *char as u64 - 96,
+                false => *char as u64 - 64 + 26,
+            }
+        })
+        .sum()
 }
 
 fn main() {
