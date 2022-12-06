@@ -53,9 +53,13 @@ fn build_stacks(starting_stack: &str) -> HashMap<usize, Vec<String>> {
     let mut stacks: HashMap<usize, Vec<String>> = HashMap::new();
     for (index, line) in stack_spec.iter().enumerate() {
         if index == 0 {
-            line.chars().skip(1).step_by(4).for_each(|char| {
-                stacks.insert(char::to_digit(char, 10).unwrap() as usize, Vec::new());
-            });
+            line
+                .chars()
+                .skip(1)
+                .step_by(4)
+                .for_each(|char| {
+                    stacks.insert(char::to_digit(char, 10).unwrap() as usize, Vec::new());
+                });
         } else {
             line.chars()
                 .skip(1)
