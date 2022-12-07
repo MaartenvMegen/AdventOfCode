@@ -24,7 +24,11 @@ fn get_stacks_and_instructions(input: &str) -> (&str, HashMap<usize, Vec<String>
     (instructions, stacks)
 }
 
-fn parse_command_and_execute(command: fn(&mut HashMap<usize, Vec<String>>, u64, &usize, &usize), instructions: &str, mut stacks: &mut HashMap<usize, Vec<String>>) {
+fn parse_command_and_execute(
+    command: fn(&mut HashMap<usize, Vec<String>>, u64, &usize, &usize),
+    instructions: &str,
+    mut stacks: &mut HashMap<usize, Vec<String>>,
+) {
     instructions.split("\n").for_each(|line| {
         let (amount, origin, destination) = parse_instruction(line);
         command(&mut stacks, amount, &origin, &destination);
@@ -53,13 +57,9 @@ fn build_stacks(starting_stack: &str) -> HashMap<usize, Vec<String>> {
     let mut stacks: HashMap<usize, Vec<String>> = HashMap::new();
     for (index, line) in stack_spec.iter().enumerate() {
         if index == 0 {
-            line
-                .chars()
-                .skip(1)
-                .step_by(4)
-                .for_each(|char| {
-                    stacks.insert(char::to_digit(char, 10).unwrap() as usize, Vec::new());
-                });
+            line.chars().skip(1).step_by(4).for_each(|char| {
+                stacks.insert(char::to_digit(char, 10).unwrap() as usize, Vec::new());
+            });
         } else {
             line.chars()
                 .skip(1)
@@ -101,7 +101,6 @@ fn perform_action_part1(
         stacks.get_mut(&destination).unwrap().push(value);
     }
 }
-
 
 fn main() {
     let example = include_str!(r"../../resources/day5-example.txt");

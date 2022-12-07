@@ -1,6 +1,6 @@
 extern crate core;
 
-use std::collections::{HashSet};
+use std::collections::HashSet;
 
 fn part1(input: &str) -> usize {
     get_packet_start(input, 4)
@@ -11,16 +11,16 @@ fn part2(input: &str) -> usize {
 }
 
 fn get_packet_start(input: &str, packet_size: usize) -> usize {
-    let input: Vec<char> = input.chars().collect();
     input
+        .chars()
+        .collect::<Vec<char>>()
         .windows(packet_size)
         .enumerate()
-        .filter(|(_, pairs)| {
-            pairs.iter().collect::<HashSet<&char>>().len() == packet_size
-        })
+        .filter(|(_, pairs)| pairs.iter().collect::<HashSet<&char>>().len() == packet_size)
         .map(|(index, _)| index)
         .next()
-        .unwrap()  + packet_size
+        .unwrap()
+        + packet_size
 }
 
 fn main() {
