@@ -1,7 +1,10 @@
 extern crate core;
 
 use std::collections::HashMap;
+use std::fs;
 use std::str::FromStr;
+
+const DAY: u32 = 7;
 
 fn part1(input: &str) -> u64 {
     let graph = get_dir_sizes(input);
@@ -31,8 +34,11 @@ fn get_dir_sizes(input: &str) -> HashMap<Vec<String>, u64> {
     let mut graph: HashMap<Vec<String>, u64> = HashMap::new();
     let mut directory_stack = Vec::new();
 
-    input.trim_end().split("$").skip(1).for_each(|line| {
-        match line.trim() {
+    input
+        .trim_end()
+        .split("$")
+        .skip(1)
+        .for_each(|line| match line.trim() {
             line if &line[0..2] == "cd" && &line[3..] == ".." => {
                 directory_stack.pop();
             }
@@ -43,8 +49,7 @@ fn get_dir_sizes(input: &str) -> HashMap<Vec<String>, u64> {
                 parse_ls_output(&mut graph, &mut directory_stack, line);
             }
             _ => (),
-        }
-    });
+        });
     graph
 }
 
@@ -68,26 +73,34 @@ fn parse_ls_output(
 }
 
 fn main() {
-    let example = include_str!(r"../../resources/day7-example.txt");
-    let input = include_str!(r"../../resources/day7-input.txt");
-    rustaoc2022::run_matrix(part1, part2, example, input);
+    let example = fs::read_to_string(format!("../../resources/day{}-example.txt", DAY))
+        .expect("Should have been able to read the file");
+    let input = fs::read_to_string(format!("../../resources/day{}-input.txt", DAY))
+        .expect("Should have been able to read the file");
+
+    rustaoc2022::run_matrix(part1, part2, example.as_str(), input.as_str());
 }
 
 #[cfg(test)]
-mod day7 {
-    use crate::{part1, part2};
+mod test {
+    use crate::{part1, part2, DAY};
+    use std::env::current_dir;
+    use std::fs;
 
     #[test]
     fn test_example() {
-        let input = include_str!(r"../../resources/day7-example.txt");
-        assert_eq!(95437, part1(input));
-        assert_eq!(24933642, part2(input));
+        println!("{:?}", current_dir());
+        let input = fs::read_to_string(format!("./resources/day{}-example.txt", DAY))
+            .expect("Should have been able to read the file");
+        assert_eq!(95437, part1(input.as_str()));
+        assert_eq!(24933642, part2(input.as_str()));
     }
 
     #[test]
     fn test_input() {
-        let input = include_str!(r"../../resources/day7-input.txt");
-        assert_eq!(1792222, part1(input));
-        assert_eq!(1112963, part2(input));
+        let input = fs::read_to_string(format!("./resources/day{}-input.txt", DAY))
+            .expect("Should have been able to read the file");
+        assert_eq!(1792222, part1(input.as_str()));
+        assert_eq!(1112963, part2(input.as_str()));
     }
 }
