@@ -1,3 +1,5 @@
+pub mod grid;
+
 use std::fmt::Debug;
 use std::time::Instant;
 

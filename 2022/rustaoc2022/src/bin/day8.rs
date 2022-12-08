@@ -1,40 +1,12 @@
-use std::collections::HashMap;
-use std::ops::Range;
-use std::str::FromStr;
 use std::{env, fs};
+use rustaoc2022::grid::{Grid, Point};
 
 const DAY: u32 = 8;
-
-struct Grid {
-    x_length: usize,
-    contents: Vec<u32>,
-}
-
-impl Grid {
-    fn get_pos(&self, position: &Point) -> u32 {
-        let (x, y) = *position;
-        self.contents[x as usize + self.x_length * y as usize]
-    }
-
-    fn get_size_x(&self) -> usize {
-        self.x_length
-    }
-
-    fn get_size_y(&self) -> usize {
-        self.contents.len() / &self.x_length
-    }
-
-    fn index_to_point(&self, index: usize) -> Point {
-        (index % self.x_length, index / self.x_length)
-    }
-}
-
-type Point = (usize, usize);
 
 fn part1(input: &str) -> u64 {
     let grid = parse_input_to_grid(input);
 
-    grid.contents
+    grid.get_content()
         .iter()
         .enumerate()
         .map(|(index, tree)| {
@@ -51,7 +23,7 @@ fn part1(input: &str) -> u64 {
                         .map(|orientation| {
                             orientation
                                 .iter()
-                                .map(|pos| grid.get_pos(pos))
+                                .map(|pos| grid.get_item_at_pos(pos))
                                 .all(|visible_tree| visible_tree < *tree)
                         })
                         .any(|visible| visible)
@@ -65,14 +37,13 @@ fn part1(input: &str) -> u64 {
 fn part2(input: &str) -> u64 {
     let grid = parse_input_to_grid(input);
 
-    grid.contents
+    grid.get_content()
         .iter()
         .enumerate()
         .map(|(index, tree)| {
-            let x = index % &grid.x_length;
-            let y = index / &grid.x_length;
-            let max_y = (&grid.contents.len() / &grid.x_length) - 1;
-            let max_x = &grid.x_length - 1;
+            let (x, y) = grid.index_to_point(index);
+            let max_y = grid.get_size_y() - 1;
+            let max_x = grid.get_size_x() - 1;
 
             get_positions_per_orientation(x, y, max_y, max_x)
                 .iter()
@@ -96,33 +67,31 @@ fn get_positions_per_orientation(
     vec![north_pos, south_pos, east_pos, west_pos]
 }
 
-fn parse_input_to_grid(input: &str) -> Grid {
+fn parse_input_to_grid(input: &str) -> Grid<u32> {
     let mut lines = input.trim().lines();
     let first = lines.next().unwrap();
-    let contents = first
+    let mut contents = first
         .chars()
         .map(|char| char.to_digit(10).unwrap())
         .collect::<Vec<u32>>();
-    let mut grid = Grid {
-        x_length: first.len(),
-        contents,
-    };
+
 
     while let Some(item) = lines.next() {
-        grid.contents.append(
+        contents.append(
             &mut item
                 .chars()
                 .map(|char| char.to_digit(10).unwrap())
                 .collect::<Vec<u32>>(),
         )
     }
-    grid
+
+    Grid::new(first.len(), contents)
 }
 
-fn get_amount_trees_visible(grid: &Grid, tree: &u32, positions: &Vec<Point>) -> usize {
+fn get_amount_trees_visible(grid: &Grid<u32>, tree: &u32, positions: &Vec<Point>) -> usize {
     let large_tree_pos = positions
         .iter()
-        .map(|pos| grid.get_pos(&pos))
+        .map(|pos| grid.get_item_at_pos(&pos))
         .position(|iter_tree| iter_tree >= *tree);
 
     if let Some(large_tree_pos) = large_tree_pos {
@@ -143,7 +112,7 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use crate::{part1, part2, DAY};
+    use crate::{DAY, part1, part2};
     use std::env::current_dir;
     use std::fs;
 
