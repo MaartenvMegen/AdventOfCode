@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::{fs};
 use rustaoc2022::grid::{Grid, Point};
 
 const DAY: u32 = 8;
@@ -113,12 +113,10 @@ fn main() {
 #[cfg(test)]
 mod test {
     use crate::{DAY, part1, part2};
-    use std::env::current_dir;
     use std::fs;
 
     #[test]
     fn test_example() {
-        println!("{:?}", current_dir());
         let input = fs::read_to_string(format!("./resources/day{}-example.txt", DAY))
             .expect("Should have been able to read the file");
         assert_eq!(21, part1(input.as_str()));
