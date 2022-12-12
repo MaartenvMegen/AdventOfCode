@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 use std::str::FromStr;
 
-
 const EXAMPLE: &str = include_str!(r"../../resources/day9-example.txt");
 const INPUT: &str = include_str!(r"../../resources/day9-input.txt");
 
@@ -15,7 +14,10 @@ impl Knot {
     fn is_adjacent(&self, other_knot: &Knot) -> bool {
         let (this_x, this_y) = self.position;
         let (other_x, other_y) = other_knot.position;
-        this_y - other_y < 2 && this_y > other_y - 2 && this_x - other_x < 2 && this_x - other_x > -2
+        this_y - other_y < 2
+            && this_y > other_y - 2
+            && this_x - other_x < 2
+            && this_x - other_x > -2
     }
 
     fn get_pulled_position(&self, other_knot: &Knot) -> Position {
@@ -37,23 +39,21 @@ impl Knot {
             0 => 0,
             x if x > 0 => -1,
             x if x < 0 => 1,
-            _ => panic!("something weird happened. delta_x = {}", delta)
+            _ => panic!("something weird happened. delta_x = {}", delta),
         };
         move_delta
     }
 }
 
-
 fn part1(input: &str) -> usize {
     move_the_rope(input, 2)
-
 }
 
 fn part2(input: &str) -> usize {
     move_the_rope(input, 10)
 }
 
-fn move_the_rope(input: &str, nr_knots : u32) -> usize {
+fn move_the_rope(input: &str, nr_knots: u32) -> usize {
     let mut visited: HashSet<Position> = HashSet::new();
     let mut knots: Vec<Knot> = (0..nr_knots).map(|_| Knot { position: (0, 0) }).collect();
 
@@ -65,7 +65,7 @@ fn move_the_rope(input: &str, nr_knots : u32) -> usize {
             "U" => (0, 1),
             "L" => (-1, 0),
             "D" => (0, -1),
-            _ => panic!("unexpected direction")
+            _ => panic!("unexpected direction"),
         };
         for _ in 0..amount {
             // only the head is moved directly, others follow
@@ -92,7 +92,7 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use crate::{EXAMPLE, INPUT, Knot, part1, part2};
+    use crate::{part1, part2, Knot, EXAMPLE, INPUT};
 
     #[test]
     fn test_example() {
@@ -106,24 +106,23 @@ mod test {
         assert_eq!(2604, part2(INPUT));
     }
 
-
     #[test]
     fn get_pulled_pos() {
         let knot_a = Knot { position: (0, 0) };
         let knot_b = Knot { position: (0, 0) };
-        assert_eq!((0,0), knot_a.get_pulled_position(&knot_b));
+        assert_eq!((0, 0), knot_a.get_pulled_position(&knot_b));
 
         let knot_a = Knot { position: (0, 0) };
         let knot_b = Knot { position: (0, 1) };
-        assert_eq!((0,0), knot_a.get_pulled_position(&knot_b));
+        assert_eq!((0, 0), knot_a.get_pulled_position(&knot_b));
 
         let knot_a = Knot { position: (0, 0) };
         let knot_b = Knot { position: (0, 2) };
-        assert_eq!((0,1), knot_a.get_pulled_position(&knot_b));
+        assert_eq!((0, 1), knot_a.get_pulled_position(&knot_b));
 
         let knot_a = Knot { position: (0, 0) };
         let knot_b = Knot { position: (1, 2) };
-        assert_eq!((1,1), knot_a.get_pulled_position(&knot_b));
+        assert_eq!((1, 1), knot_a.get_pulled_position(&knot_b));
     }
 
     #[test]

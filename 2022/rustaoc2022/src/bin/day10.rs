@@ -1,19 +1,18 @@
 use std::str::FromStr;
 
-
 const EXAMPLE: &str = include_str!(r"../../resources/day10-example.txt");
 const INPUT: &str = include_str!(r"../../resources/day10-input.txt");
 
 fn part1(input: &str) -> i64 {
     let mut cycle = 0;
     let mut value = 1;
-    let mut signal_strenghs : Vec<i64> = Vec::new();
+    let mut signal_strenghs: Vec<i64> = Vec::new();
     let mut output = String::new();
 
     for line in input.trim().split("\n") {
         let mut parts = line.split(" ");
         let (cycles, add_value) = match parts.next().unwrap() {
-            "noop" => (1,0),
+            "noop" => (1, 0),
             "addx" => (2, i64::from_str(parts.next().unwrap()).unwrap()),
             _ => panic!("unexpected instruction: {line}"),
         };
@@ -23,7 +22,7 @@ fn part1(input: &str) -> i64 {
             update_single_strength(cycle, value, &mut signal_strenghs)
         }
         value += add_value;
-    };
+    }
     signal_strenghs.iter().sum()
 }
 
@@ -48,7 +47,8 @@ fn update_screen(cycle: &i64, value: &i64, output: &mut String) {
 }
 
 fn part2(_input: &str) -> i64 {
-0}
+    0
+}
 
 fn main() {
     rustaoc2022::run_matrix(part1, part2, EXAMPLE, INPUT);
@@ -56,7 +56,7 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use crate::{EXAMPLE, INPUT, part1};
+    use crate::{part1, EXAMPLE, INPUT};
 
     #[test]
     fn test_example() {
@@ -67,5 +67,4 @@ mod test {
     fn test_input() {
         assert_eq!(12560, part1(INPUT));
     }
-
 }

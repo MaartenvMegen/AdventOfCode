@@ -1,5 +1,5 @@
-use std::{fs};
 use rustaoc2022::grid::{Grid, Point};
+use std::fs;
 
 const DAY: u32 = 8;
 
@@ -11,8 +11,8 @@ fn part1(input: &str) -> u64 {
         .enumerate()
         .map(|(index, tree)| {
             let point = grid.index_to_point(index);
-            let max_x = grid.get_size_x() -1;
-            let max_y = grid.get_size_y() -1;
+            let max_x = grid.get_size_x() - 1;
+            let max_y = grid.get_size_y() - 1;
 
             match point {
                 (x, y) if x == 0 || x == max_x || y == 0 || y == max_y => true,
@@ -75,7 +75,6 @@ fn parse_input_to_grid(input: &str) -> Grid<u32> {
         .map(|char| char.to_digit(10).unwrap())
         .collect::<Vec<u32>>();
 
-
     while let Some(item) = lines.next() {
         contents.append(
             &mut item
@@ -112,7 +111,7 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use crate::{DAY, part1, part2};
+    use crate::{part1, part2, DAY};
     use std::fs;
 
     #[test]

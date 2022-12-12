@@ -4,15 +4,21 @@ pub struct Grid<T> {
 }
 
 impl<T> Grid<T>
-where T: Copy
+where
+    T: Copy,
 {
     pub fn new(x_length: usize, contents: Vec<T>) -> Grid<T> {
-        return Self { x_length, contents }
+        return Self { x_length, contents };
     }
 
     pub fn get_item_at_pos(&self, position: &Point) -> T {
         let (x, y) = *position;
         self.contents[x + self.x_length * y]
+    }
+
+    pub fn set_item_at_pos(&mut self, position: &Point, value: T) {
+        let (x, y) = *position;
+        self.contents[x + self.x_length * y] = value
     }
 
     pub fn get_size_x(&self) -> usize {
