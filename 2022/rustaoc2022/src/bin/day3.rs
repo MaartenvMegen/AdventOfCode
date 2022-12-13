@@ -5,7 +5,7 @@ use std::collections::HashSet;
 fn part1(input: &str) -> u64 {
     input
         .trim()
-        .split("\n")
+        .split('\n')
         .map(|line| {
             let (first, second) = line.split_at(line.len() / 2);
             let first: HashSet<char> = HashSet::from_iter(first.chars());
@@ -27,7 +27,7 @@ fn part2(input: &str) -> u64 {
         .map(|pair| {
             let first: HashSet<char> = HashSet::from_iter(pair[0].chars());
             let second: HashSet<char> = HashSet::from_iter(pair[1].chars());
-            let overlap1: HashSet<char> = first.intersection(&second).map(|char| *char).collect();
+            let overlap1: HashSet<char> = first.intersection(&second).copied().collect();
             let third: HashSet<char> = HashSet::from_iter(pair[2].chars());
             let char = third.intersection(&overlap1).next().unwrap();
             match char.is_ascii_lowercase() {

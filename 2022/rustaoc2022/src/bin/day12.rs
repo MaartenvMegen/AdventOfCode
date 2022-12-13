@@ -36,7 +36,7 @@ fn parse_input_to_grid(input: &str) -> Grid<i32> {
     let first = lines.next().unwrap();
     let mut contents = first.chars().map(|char| char as i32).collect::<Vec<i32>>();
 
-    while let Some(item) = lines.next() {
+    for item in lines {
         contents.append(&mut item.chars().map(|char| char as i32).collect::<Vec<i32>>())
     }
 

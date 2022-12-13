@@ -75,7 +75,7 @@ fn parse_input_to_grid(input: &str) -> Grid<u32> {
         .map(|char| char.to_digit(10).unwrap())
         .collect::<Vec<u32>>();
 
-    while let Some(item) = lines.next() {
+    for item in lines {
         contents.append(
             &mut item
                 .chars()
@@ -90,7 +90,7 @@ fn parse_input_to_grid(input: &str) -> Grid<u32> {
 fn get_amount_trees_visible(grid: &Grid<u32>, tree: &u32, positions: &Vec<Point>) -> usize {
     let large_tree_pos = positions
         .iter()
-        .map(|pos| grid.get_item_at_pos(&pos))
+        .map(|pos| grid.get_item_at_pos(pos))
         .position(|iter_tree| iter_tree >= *tree);
 
     if let Some(large_tree_pos) = large_tree_pos {

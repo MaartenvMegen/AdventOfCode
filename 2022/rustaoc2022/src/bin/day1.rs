@@ -12,7 +12,7 @@ fn part2(input: &str) -> u64 {
     three_heighest_elf_sum(&mut calories_per_elf)
 }
 
-fn three_heighest_elf_sum(calories_per_elf: &mut Vec<u64>) -> u64 {
+fn three_heighest_elf_sum(calories_per_elf: &mut [u64]) -> u64 {
     calories_per_elf.sort();
     calories_per_elf.iter().rev().take(3).sum()
 }
@@ -22,7 +22,7 @@ fn get_calories_per_elf(parts: Vec<&str>) -> Vec<u64> {
         .iter()
         .map(|chunk| {
             chunk
-                .split("\n")
+                .split('\n')
                 .map(|value| u64::from_str(value).unwrap())
                 .sum()
         })

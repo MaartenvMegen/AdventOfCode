@@ -36,7 +36,7 @@ fn get_dir_sizes(input: &str) -> HashMap<Vec<String>, u64> {
 
     input
         .trim_end()
-        .split("$")
+        .split('$')
         .skip(1)
         .for_each(|line| match line.trim() {
             line if &line[0..2] == "cd" && &line[3..] == ".." => {
@@ -58,11 +58,11 @@ fn parse_ls_output(
     directory_stack: &mut Vec<String>,
     line: &str,
 ) {
-    line.split("\n")
+    line.split('\n')
         .skip(1)
         .filter(|line| &line[0..3] != "dir")
         .for_each(|ls_output| {
-            let file_size = ls_output.split_once(" ").unwrap().0;
+            let file_size = ls_output.split_once(' ').unwrap().0;
 
             for index in 0..directory_stack.len() + 1 {
                 *graph

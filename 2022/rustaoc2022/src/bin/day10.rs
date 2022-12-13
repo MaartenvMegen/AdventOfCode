@@ -9,8 +9,8 @@ fn part1(input: &str) -> i64 {
     let mut signal_strenghs: Vec<i64> = Vec::new();
     let mut output = String::new();
 
-    for line in input.trim().split("\n") {
-        let mut parts = line.split(" ");
+    for line in input.trim().split('\n') {
+        let mut parts = line.split(' ');
         let (cycles, add_value) = match parts.next().unwrap() {
             "noop" => (1, 0),
             "addx" => (2, i64::from_str(parts.next().unwrap()).unwrap()),
@@ -18,7 +18,7 @@ fn part1(input: &str) -> i64 {
         };
         for _ in 0..cycles {
             cycle += 1;
-            update_screen(&mut cycle, &mut value, &mut output);
+            update_screen(&cycle, &value, &mut output);
             update_single_strength(cycle, value, &mut signal_strenghs)
         }
         value += add_value;

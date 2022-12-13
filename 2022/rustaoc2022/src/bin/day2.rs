@@ -32,9 +32,9 @@ fn map_goal_to_num(goal: &str, other_hand: u64) -> u64 {
 fn part1(input: &str) -> u64 {
     input
         .trim()
-        .split("\n")
+        .split('\n')
         .map(|line| {
-            let pairs: Vec<u64> = line.split(" ").map(map_symbol_to_value).take(2).collect();
+            let pairs: Vec<u64> = line.split(' ').map(map_symbol_to_value).take(2).collect();
             calculate_score(pairs[0], pairs[1])
         })
         .sum()
@@ -43,9 +43,9 @@ fn part1(input: &str) -> u64 {
 fn part2(input: &str) -> u64 {
     input
         .trim()
-        .split("\n")
+        .split('\n')
         .map(|line| {
-            let pairs: Vec<&str> = line.split(" ").take(2).collect();
+            let pairs: Vec<&str> = line.split(' ').take(2).collect();
             let other = map_symbol_to_value(pairs[0]);
             calculate_score(other, map_goal_to_num(pairs[1], other))
         })

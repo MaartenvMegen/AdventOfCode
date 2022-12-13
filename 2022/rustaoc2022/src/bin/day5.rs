@@ -27,11 +27,11 @@ fn get_stacks_and_instructions(input: &str) -> (&str, HashMap<usize, Vec<String>
 fn parse_command_and_execute(
     command: fn(&mut HashMap<usize, Vec<String>>, u64, &usize, &usize),
     instructions: &str,
-    mut stacks: &mut HashMap<usize, Vec<String>>,
+    stacks: &mut HashMap<usize, Vec<String>>,
 ) {
-    instructions.split("\n").for_each(|line| {
+    instructions.split('\n').for_each(|line| {
         let (amount, origin, destination) = parse_instruction(line);
-        command(&mut stacks, amount, &origin, &destination);
+        command(stacks, amount, &origin, &destination);
     });
 }
 
@@ -44,15 +44,15 @@ fn calculate_output(mut stacks: HashMap<usize, Vec<String>>) -> String {
 }
 
 fn parse_instruction(line: &str) -> (u64, usize, usize) {
-    let instruction: Vec<&str> = line.split(" ").skip(1).step_by(2).collect();
+    let instruction: Vec<&str> = line.split(' ').skip(1).step_by(2).collect();
     let amount = u64::from_str(instruction[0]).unwrap();
-    let origin = usize::from_str_radix(instruction[1], 10).unwrap();
-    let destination = usize::from_str_radix(instruction[2], 10).unwrap();
+    let origin = instruction[1].parse::<usize>().unwrap();
+    let destination = instruction[2].parse::<usize>().unwrap();
     (amount, origin, destination)
 }
 
 fn build_stacks(starting_stack: &str) -> HashMap<usize, Vec<String>> {
-    let mut stack_spec: Vec<&str> = starting_stack.split("\n").collect();
+    let mut stack_spec: Vec<&str> = starting_stack.split('\n').collect();
     stack_spec.reverse();
     let mut stacks: HashMap<usize, Vec<String>> = HashMap::new();
     for (index, line) in stack_spec.iter().enumerate() {
@@ -84,9 +84,9 @@ fn perform_action_part2(
     origin: &usize,
     destination: &usize,
 ) {
-    let value = stacks.get_mut(&origin).unwrap();
+    let value = stacks.get_mut(origin).unwrap();
     let to_move_stack = value.split_off(value.len() - amount as usize);
-    stacks.get_mut(&destination).unwrap().extend(to_move_stack);
+    stacks.get_mut(destination).unwrap().extend(to_move_stack);
 }
 
 fn perform_action_part1(
@@ -96,9 +96,9 @@ fn perform_action_part1(
     destination: &usize,
 ) {
     for _ in 0..amount {
-        let value = stacks.get_mut(&origin).unwrap();
+        let value = stacks.get_mut(origin).unwrap();
         let value = value.pop().unwrap();
-        stacks.get_mut(&destination).unwrap().push(value);
+        stacks.get_mut(destination).unwrap().push(value);
     }
 }
 

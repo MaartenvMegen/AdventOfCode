@@ -35,13 +35,12 @@ impl Knot {
 
     fn get_move_delta(this: i32, other: i32) -> i32 {
         let delta = this - other;
-        let move_delta = match delta {
+        match delta {
             0 => 0,
             x if x > 0 => -1,
             x if x < 0 => 1,
             _ => panic!("something weird happened. delta_x = {}", delta),
-        };
-        move_delta
+        }
     }
 }
 
@@ -57,8 +56,8 @@ fn move_the_rope(input: &str, nr_knots: u32) -> usize {
     let mut visited: HashSet<Position> = HashSet::new();
     let mut knots: Vec<Knot> = (0..nr_knots).map(|_| Knot { position: (0, 0) }).collect();
 
-    input.trim().split("\n").for_each(|instruction| {
-        let (direction, amount) = instruction.split_once(" ").unwrap();
+    input.trim().split('\n').for_each(|instruction| {
+        let (direction, amount) = instruction.split_once(' ').unwrap();
         let amount = u64::from_str(amount).unwrap();
         let (delta_x, delta_y) = match direction {
             "R" => (1, 0),

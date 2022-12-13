@@ -8,7 +8,7 @@ where
     T: Copy,
 {
     pub fn new(x_length: usize, contents: Vec<T>) -> Grid<T> {
-        return Self { x_length, contents };
+        Self { x_length, contents }
     }
 
     pub fn get_item_at_pos(&self, position: &Point) -> T {
@@ -26,7 +26,7 @@ where
     }
 
     pub fn get_size_y(&self) -> usize {
-        self.contents.len() / &self.x_length
+        self.contents.len() / self.x_length
     }
 
     pub fn index_to_point(&self, index: usize) -> Point {
