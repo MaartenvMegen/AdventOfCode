@@ -1,4 +1,4 @@
-use rustaoc2022::grid::{Grid, Point};
+use rustaoc2022::grid::{Grid, Location};
 use std::fs;
 
 const DAY: u32 = 8;
@@ -59,11 +59,11 @@ fn get_positions_per_orientation(
     y: usize,
     max_y: usize,
     max_x: usize,
-) -> Vec<Vec<Point>> {
-    let north_pos: Vec<Point> = (0..y).rev().map(|y_range| (x, y_range)).collect();
-    let south_pos: Vec<Point> = (y + 1..=max_y).map(|y_range| (x, y_range)).collect();
-    let east_pos: Vec<Point> = (x + 1..=max_x).map(|x_range| (x_range, y)).collect();
-    let west_pos: Vec<Point> = (0..x).rev().map(|x_range| (x_range, y)).collect();
+) -> Vec<Vec<Location>> {
+    let north_pos: Vec<Location> = (0..y).rev().map(|y_range| (x, y_range)).collect();
+    let south_pos: Vec<Location> = (y + 1..=max_y).map(|y_range| (x, y_range)).collect();
+    let east_pos: Vec<Location> = (x + 1..=max_x).map(|x_range| (x_range, y)).collect();
+    let west_pos: Vec<Location> = (0..x).rev().map(|x_range| (x_range, y)).collect();
     vec![north_pos, south_pos, east_pos, west_pos]
 }
 
@@ -87,7 +87,7 @@ fn parse_input_to_grid(input: &str) -> Grid<u32> {
     Grid::new(first.len(), contents)
 }
 
-fn get_amount_trees_visible(grid: &Grid<u32>, tree: &u32, positions: &Vec<Point>) -> usize {
+fn get_amount_trees_visible(grid: &Grid<u32>, tree: &u32, positions: &Vec<Location>) -> usize {
     let large_tree_pos = positions
         .iter()
         .map(|pos| grid.get_item_at_pos(pos))

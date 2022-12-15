@@ -1,4 +1,4 @@
-use rustaoc2022::grid::{Grid, Point};
+use rustaoc2022::grid::{Grid, Location};
 use std::collections::HashSet;
 
 const EXAMPLE: &str = include_str!(r"../../resources/day12-example.txt");
@@ -7,7 +7,7 @@ const INPUT: &str = include_str!(r"../../resources/day12-input.txt");
 const DIRECTIONS: [(i64, i64); 4] = [(0, 1), (1, 0), (-1, 0), (0, -1)];
 
 enum Target {
-    Location(Point),
+    Location(Location),
     Value(i32),
 }
 
@@ -43,7 +43,7 @@ fn parse_input_to_grid(input: &str) -> Grid<i32> {
     Grid::new(first.len(), contents)
 }
 
-fn get_grid_with_start_and_end(input: &str) -> (Grid<i32>, Point, Point) {
+fn get_grid_with_start_and_end(input: &str) -> (Grid<i32>, Location, Location) {
     let mut grid = parse_input_to_grid(input);
     let start = grid.index_to_point(
         grid.get_content()
@@ -72,18 +72,18 @@ fn valid_neighbour_backwards(current: i32, considered: i32) -> bool {
 
 fn search(
     grid: &Grid<i32>,
-    start_point: Point,
+    start_point: Location,
     target: Target,
     valid_neighbour_fn: fn(i32, i32) -> bool,
 ) -> u64 {
-    let mut visited_locs: HashSet<Point> = HashSet::new();
-    let mut search_edge: HashSet<Point> = HashSet::new();
+    let mut visited_locs: HashSet<Location> = HashSet::new();
+    let mut search_edge: HashSet<Location> = HashSet::new();
     search_edge.insert(start_point);
     let mut distance = 0;
 
     'searchloop: loop {
         distance += 1;
-        let mut new_nodes: HashSet<Point> = HashSet::new();
+        let mut new_nodes: HashSet<Location> = HashSet::new();
         for loc in search_edge {
             visited_locs.insert(loc);
             let current_height = grid.get_item_at_pos(&loc);
@@ -97,7 +97,7 @@ fn search(
                     continue;
                 }
 
-                let new_loc: Point = (new_x, new_y);
+                let new_loc: Location = (new_x, new_y);
                 let new_height = grid.get_item_at_pos(&new_loc);
 
                 if valid_neighbour_fn(current_height, new_height) {
