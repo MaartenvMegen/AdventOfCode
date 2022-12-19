@@ -1,6 +1,7 @@
 use std::collections::{HashMap, HashSet};
 use std::thread::sleep;
 use std::time::Duration;
+use colored::*;
 
 const EXAMPLE: &str = include_str!(r"../../resources/day14-example.txt");
 const INPUT: &str = include_str!(r"../../resources/day14-input.txt");
@@ -56,16 +57,14 @@ fn drop_sand(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_min: 
                         continue;
                     }
                 }
-
             }
             // if no viable location found we place sand at current location
             if !found {
                 //println!("inserting sand at location {:?}", current_loc);
                 grid.insert(current_loc, 'o');
-                break 'droploop
+                break 'droploop;
             }
         }
-
     }
 
 
@@ -91,22 +90,20 @@ fn drop_sand_pt2(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_m
             let offsets = vec![(0, 1), (-1, 1), (1, 1)];
             let mut found = false;
 
-            // iterations += 1;
-            // //sleep(Duration::from_millis(20));
-            // if iterations % 1 == 0 {
-            //     display_grid(grid, &(x_min-10), &(x_max+10), &y_max, current_loc);
-            //
-            // }
-            
+            iterations += 1;
+            sleep(Duration::from_millis(100));
+            if iterations % 1 == 0 {
+                display_grid(grid, &(x_min - 10), &(x_max + 10), &y_max, current_loc);
+            }
+
             for (x_offset, y_offset) in offsets {
                 let new_loc = (current_loc.0 + x_offset, current_loc.1 + y_offset);
                 //println!("now checking location: {:?}: xmin xminx {},{}", new_loc, x_min, x_max);
 
                 if new_loc.1 == y_max + 2 {
                     // we hit the floor, find another spot
-                    continue
+                    continue;
                 }
-
 
 
                 match grid.get(&new_loc) {
@@ -122,9 +119,7 @@ fn drop_sand_pt2(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_m
                         continue;
                     }
                 }
-
             }
-
 
 
             // if no viable location found we place sand at current location
@@ -134,12 +129,11 @@ fn drop_sand_pt2(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_m
 
                 if current_loc == sand_origin {
                     //display_grid(grid, &x_min, &x_max, &y_max);
-                    break 'sandloop
+                    break 'sandloop;
                 }
-                break 'droploop
+                break 'droploop;
             }
         }
-
     }
 
 
@@ -168,21 +162,39 @@ fn part1(_input: &str) -> usize {
 
 fn display_grid(grid: &HashMap<Location, char>, x_min: &i64, x_max: &i64, y_max: &i64, current_loc: Location) {
     // set cursor to start
+
     print!("\x1B[1;1H");
+    print!("{}", "|".blue());
+    for _ in *x_min..*x_max+1 {
+        print!("{}","-".blue())
+    }
+    print!("{}","|\n".blue());
     for y in 0..=*y_max {
+        print!("{}","|".blue());
         for x in *x_min..=*x_max {
             let loc: Location = (x, y);
             if loc == current_loc {
-                print!("o");
-                continue
+                print!("{}","o".yellow());
+                continue;
             }
             match grid.get(&loc) {
-                None => { print!(".") }
-                Some(char) => { print!("{}", char) }
+                None => { print!(" ") }
+                Some(char) => {
+                    match char {
+                        '#' => print!("{}", char.to_string().white().bold()),
+                        'o' => print!("{}", char.to_string().yellow()),
+                        _ => print!("{}", char.to_string().yellow()),
+                    }
+                }
             }
         }
-        print!("\n")
+        print!("{}","|\n".blue())
     }
+    print!("{}","|".blue());
+    for _ in *x_min..*x_max+1 {
+        print!("{}","-".blue())
+    }
+    print!("{}","|\n".blue());
 }
 
 fn parse_to_grid(_input: &str) -> (HashMap<Location, char>, HashSet<i64>, HashSet<i64>) {
