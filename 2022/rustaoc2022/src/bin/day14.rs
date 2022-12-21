@@ -1,7 +1,7 @@
+use colored::*;
 use std::collections::{HashMap, HashSet};
 use std::thread::sleep;
 use std::time::Duration;
-use colored::*;
 
 const EXAMPLE: &str = include_str!(r"../../resources/day14-example.txt");
 const INPUT: &str = include_str!(r"../../resources/day14-input.txt");
@@ -21,7 +21,13 @@ fn diffs(point_a: Location, point_b: Location) -> (i64, i64) {
 
 const ROCK: char = '#';
 
-fn drop_sand(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_min: i64, y_max: i64) -> usize {
+fn drop_sand(
+    grid: &mut HashMap<Location, char>,
+    x_min: i64,
+    x_max: i64,
+    y_min: i64,
+    y_max: i64,
+) -> usize {
     // assume its not straight down
     let sand_origin: Location = (500, 0);
     // drop until location below,
@@ -67,13 +73,21 @@ fn drop_sand(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_min: 
         }
     }
 
-
-    let value: usize = grid.iter().map(|(key, value)| value).filter(|char| **char == 'o').count();
+    let value: usize = grid
+        .iter()
+        .map(|(key, value)| value)
+        .filter(|char| **char == 'o')
+        .count();
     value
 }
 
-
-fn drop_sand_pt2(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_min: i64, y_max: i64) -> usize {
+fn drop_sand_pt2(
+    grid: &mut HashMap<Location, char>,
+    x_min: i64,
+    x_max: i64,
+    y_min: i64,
+    y_max: i64,
+) -> usize {
     // assume its not straight down
     let sand_origin: Location = (500, 0);
     // drop until location below,
@@ -105,7 +119,6 @@ fn drop_sand_pt2(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_m
                     continue;
                 }
 
-
                 match grid.get(&new_loc) {
                     None => {
                         // move further to allowed location, break out of for loop
@@ -121,7 +134,6 @@ fn drop_sand_pt2(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_m
                 }
             }
 
-
             // if no viable location found we place sand at current location
             if !found {
                 //println!("inserting sand at location {:?}", current_loc);
@@ -136,8 +148,11 @@ fn drop_sand_pt2(grid: &mut HashMap<Location, char>, x_min: i64, x_max: i64, y_m
         }
     }
 
-
-    let value: usize = grid.iter().map(|(key, value)| value).filter(|char| **char == 'o').count();
+    let value: usize = grid
+        .iter()
+        .map(|(key, value)| value)
+        .filter(|char| **char == 'o')
+        .count();
     value
 }
 
@@ -160,41 +175,47 @@ fn part1(_input: &str) -> usize {
     value
 }
 
-fn display_grid(grid: &HashMap<Location, char>, x_min: &i64, x_max: &i64, y_max: &i64, current_loc: Location) {
+fn display_grid(
+    grid: &HashMap<Location, char>,
+    x_min: &i64,
+    x_max: &i64,
+    y_max: &i64,
+    current_loc: Location,
+) {
     // set cursor to start
 
     print!("\x1B[1;1H");
     print!("{}", "|".blue());
-    for _ in *x_min..*x_max+1 {
-        print!("{}","-".blue())
+    for _ in *x_min..*x_max + 1 {
+        print!("{}", "-".blue())
     }
-    print!("{}","|\n".blue());
+    print!("{}", "|\n".blue());
     for y in 0..=*y_max {
-        print!("{}","|".blue());
+        print!("{}", "|".blue());
         for x in *x_min..=*x_max {
             let loc: Location = (x, y);
             if loc == current_loc {
-                print!("{}","o".yellow());
+                print!("{}", "o".yellow());
                 continue;
             }
             match grid.get(&loc) {
-                None => { print!(" ") }
-                Some(char) => {
-                    match char {
-                        '#' => print!("{}", char.to_string().white().bold()),
-                        'o' => print!("{}", char.to_string().yellow()),
-                        _ => print!("{}", char.to_string().yellow()),
-                    }
+                None => {
+                    print!(" ")
                 }
+                Some(char) => match char {
+                    '#' => print!("{}", char.to_string().white().bold()),
+                    'o' => print!("{}", char.to_string().yellow()),
+                    _ => print!("{}", char.to_string().yellow()),
+                },
             }
         }
-        print!("{}","|\n".blue())
+        print!("{}", "|\n".blue())
     }
-    print!("{}","|".blue());
-    for _ in *x_min..*x_max+1 {
-        print!("{}","-".blue())
+    print!("{}", "|".blue());
+    for _ in *x_min..*x_max + 1 {
+        print!("{}", "-".blue())
     }
-    print!("{}","|\n".blue());
+    print!("{}", "|\n".blue());
 }
 
 fn parse_to_grid(_input: &str) -> (HashMap<Location, char>, HashSet<i64>, HashSet<i64>) {
@@ -221,7 +242,6 @@ fn parse_to_grid(_input: &str) -> (HashMap<Location, char>, HashSet<i64>, HashSe
                 start_y = nodes[1].1;
                 end_y = nodes[0].1;
             }
-
 
             for x_index in start_x..=end_x {
                 for y_index in start_y..=end_y {
@@ -254,7 +274,6 @@ fn part2(_input: &str) -> usize {
     println!("total sand {}", value);
     value
 }
-
 
 fn main() {
     // clear terminal

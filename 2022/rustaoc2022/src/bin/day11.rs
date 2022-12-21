@@ -25,12 +25,7 @@ fn part1(input: &str) -> u64 {
         .map(|monkey| {
             let mut monkey_spec = monkey.split('\n');
             let _monkey_name = monkey_spec.next();
-            let starting_items = monkey_spec
-                .next()
-                .unwrap()
-                .split(':')
-                .nth(1)
-                .unwrap();
+            let starting_items = monkey_spec.next().unwrap().split(':').nth(1).unwrap();
             let starting_items: Vec<u64> = starting_items
                 .split(',')
                 .map(|item| item.trim().parse::<u64>().unwrap())
@@ -39,9 +34,7 @@ fn part1(input: &str) -> u64 {
 
             let operator = match operation {
                 "* old" => Operator::PowerTwo(),
-                _ if operation.starts_with('+') => {
-                    Add(operation[2..].parse::<u64>().unwrap())
-                }
+                _ if operation.starts_with('+') => Add(operation[2..].parse::<u64>().unwrap()),
                 _ if operation.starts_with('*') => {
                     Operator::Multiply(operation[2..].parse::<u64>().unwrap())
                 }
@@ -121,12 +114,7 @@ fn part2(input: &str) -> u64 {
         .map(|monkey| {
             let mut monkey_spec = monkey.split('\n');
             let _monkey_name = monkey_spec.next();
-            let starting_items = monkey_spec
-                .next()
-                .unwrap()
-                .split(':')
-                .nth(1)
-                .unwrap();
+            let starting_items = monkey_spec.next().unwrap().split(':').nth(1).unwrap();
             let starting_items: Vec<u64> = starting_items
                 .split(',')
                 .map(|item| item.trim().parse::<u64>().unwrap())
@@ -135,9 +123,7 @@ fn part2(input: &str) -> u64 {
 
             let operator = match operation {
                 "* old" => Operator::PowerTwo(),
-                _ if operation.starts_with('+') => {
-                    Add(operation[2..].parse::<u64>().unwrap())
-                }
+                _ if operation.starts_with('+') => Add(operation[2..].parse::<u64>().unwrap()),
                 _ if operation.starts_with('*') => {
                     Operator::Multiply(operation[2..].parse::<u64>().unwrap())
                 }

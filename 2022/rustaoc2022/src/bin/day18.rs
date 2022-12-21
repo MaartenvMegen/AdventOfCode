@@ -4,20 +4,27 @@ use std::collections::HashSet;
 const EXAMPLE: &str = include_str!(r"../../resources/day18-example.txt");
 const INPUT: &str = include_str!(r"../../resources/day18-input.txt");
 
-const NEIGHBOURS: [(i64, i64, i64); 6] = [(1, 0, 0), (0, 1, 0), (0, 0, 1) , (-1, 0, 0), (0, -1, 0), (0, 0, -1)];
+const NEIGHBOURS: [(i64, i64, i64); 6] = [
+    (1, 0, 0),
+    (0, 1, 0),
+    (0, 0, 1),
+    (-1, 0, 0),
+    (0, -1, 0),
+    (0, 0, -1),
+];
 
-type Point3d = (i64,i64,i64);
+type Point3d = (i64, i64, i64);
 
 struct Grid3d {
-    contents : HashSet<Point3d>
+    contents: HashSet<Point3d>,
 }
 
 impl Grid3d {
     pub(crate) fn get_faces(&self) -> i64 {
         let mut accumulator = 0;
-        for (x,y,z) in &self.contents {
-            for (xd,yd,zd) in NEIGHBOURS {
-                let newloc : Point3d = (x+xd,y+yd,z+zd);
+        for (x, y, z) in &self.contents {
+            for (xd, yd, zd) in NEIGHBOURS {
+                let newloc: Point3d = (x + xd, y + yd, z + zd);
                 if !self.contents.contains(&newloc) {
                     accumulator += 1
                 }
@@ -28,37 +35,53 @@ impl Grid3d {
 }
 
 fn part1(input: &str) -> i64 {
-    let mut grid = Grid3d { contents: Default::default() };
+    let mut grid = Grid3d {
+        contents: Default::default(),
+    };
     for line in input.trim().lines() {
-        let point = line.split(',').map(|char| char.parse::<i64>().unwrap()).collect::<Vec<i64>>();
-        let point : Point3d = (point[0], point[1], point[2]);
+        let point = line
+            .split(',')
+            .map(|char| char.parse::<i64>().unwrap())
+            .collect::<Vec<i64>>();
+        let point: Point3d = (point[0], point[1], point[2]);
         grid.contents.insert(point);
     }
     grid.get_faces()
 }
 
 fn part2(input: &str) -> i64 {
-    let mut grid = Grid3d { contents: Default::default() };
+    let mut grid = Grid3d {
+        contents: Default::default(),
+    };
     for line in input.trim().lines() {
-        let point = line.split(',').map(|char| char.parse::<i64>().unwrap()).collect::<Vec<i64>>();
-        let point : Point3d = (point[0], point[1], point[2]);
+        let point = line
+            .split(',')
+            .map(|char| char.parse::<i64>().unwrap())
+            .collect::<Vec<i64>>();
+        let point: Point3d = (point[0], point[1], point[2]);
         grid.contents.insert(point);
     }
 
     // invert the grid in a safe array size
-    let mut inverted_grid = Grid3d { contents: Default::default() };
+    let mut inverted_grid = Grid3d {
+        contents: Default::default(),
+    };
     for x in -1..30 {
         for y in -1..30 {
             for z in -1..30 {
-                let point = (x,y,z);
-                if !grid.contents.contains( &point) {
+                let point = (x, y, z);
+                if !grid.contents.contains(&point) {
                     inverted_grid.contents.insert(point);
                 }
             }
         }
     }
 
-    println!("starting BFS using grid of size : {} and inverted grid of size {}", grid.contents.len(), inverted_grid.contents.len());
+    println!(
+        "starting BFS using grid of size : {} and inverted grid of size {}",
+        grid.contents.len(),
+        inverted_grid.contents.len()
+    );
 
     // assemble all inverted points from the outside
     // collect faces along the way
@@ -66,17 +89,17 @@ fn part2(input: &str) -> i64 {
     let mut scanned_locs = HashSet::new();
     let mut accumulator = 0;
 
-    search_edge.insert((0,0,0));
-    'searchloop : loop {
+    search_edge.insert((0, 0, 0));
+    'searchloop: loop {
         let mut new_edge: HashSet<Point3d> = HashSet::new();
-        for (x,y,z) in &search_edge {
+        for (x, y, z) in &search_edge {
             //println!("now scanning x={},y={},z={}", x,y,z);
-            for (xd,yd,zd) in NEIGHBOURS {
-                let newloc = (x+xd, y+yd, z+zd);
+            for (xd, yd, zd) in NEIGHBOURS {
+                let newloc = (x + xd, y + yd, z + zd);
                 if inverted_grid.contents.contains(&newloc) && !scanned_locs.contains(&newloc) {
                     new_edge.insert(newloc);
                 }
-                if grid.contents.contains(&newloc)  {
+                if grid.contents.contains(&newloc) {
                     //println!("found a face");
                     accumulator += 1;
                 }
@@ -100,15 +123,25 @@ fn part2(input: &str) -> i64 {
     // option a: it fails to scan all directions properly from each outside point?
     // option b: the range is too limited -> THIS WAS IT! 0..30 needed to be -1..30
     // lesson learned. do not hardcode stuff.
-    let mut bubble = Grid3d { contents: Default::default() };
+    let mut bubble = Grid3d {
+        contents: Default::default(),
+    };
     for loc in inverted_grid.contents {
         if !scanned_locs.contains(&loc) {
             bubble.contents.insert(loc);
         }
     }
 
-    println!("created a bubble with {} blocks and {} faces", bubble.contents.len(), bubble.get_faces());
-    println!("accumulator thinks {} while droplet-airpocket = {}", accumulator, grid.get_faces()-bubble.get_faces());
+    println!(
+        "created a bubble with {} blocks and {} faces",
+        bubble.contents.len(),
+        bubble.get_faces()
+    );
+    println!(
+        "accumulator thinks {} while droplet-airpocket = {}",
+        accumulator,
+        grid.get_faces() - bubble.get_faces()
+    );
     println!("now scanned {} locs", scanned_locs.len());
     grid.get_faces() - bubble.get_faces()
 }
@@ -119,7 +152,7 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use crate::{part1, part2, EXAMPLE, INPUT, Grid3d};
+    use crate::{part1, part2, Grid3d, EXAMPLE, INPUT};
 
     #[test]
     fn test_example() {
@@ -135,10 +168,11 @@ mod test {
 
     #[test]
     fn test_example_small() {
-        let mut grid = Grid3d { contents: Default::default() };
-        grid.contents.insert( (1,1,1));
-        grid.contents.insert((2,1,1));
+        let mut grid = Grid3d {
+            contents: Default::default(),
+        };
+        grid.contents.insert((1, 1, 1));
+        grid.contents.insert((2, 1, 1));
         assert_eq!(10, grid.get_faces())
     }
-
 }

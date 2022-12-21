@@ -1,7 +1,5 @@
-
 const EXAMPLE: &str = include_str!(r"../../resources/day13-example.txt");
 const INPUT: &str = include_str!(r"../../resources/day13-input.txt");
-
 
 fn part1(_input: &str) -> u64 {
     0
@@ -10,8 +8,6 @@ fn part1(_input: &str) -> u64 {
 fn part2(_input: &str) -> u64 {
     0
 }
-
-
 
 fn main() {
     rustaoc2022::run_matrix(part1, part2, EXAMPLE, INPUT);

@@ -1,8 +1,8 @@
+use colored::*;
+use regex::Regex;
 use std::collections::{HashMap, HashSet};
 use std::thread::sleep;
 use std::time::Duration;
-use colored::*;
-use regex::Regex;
 
 const EXAMPLE: &str = include_str!(r"../../resources/day15-example.txt");
 const INPUT: &str = include_str!(r"../../resources/day15-input.txt");
@@ -31,7 +31,10 @@ fn part1(input: &str) -> i64 {
     }
 
     for (sensor, beacon, distance) in pairs {
-        println!("now evaluating sensor {:?} with nearest beacon {:?}", sensor, beacon);
+        println!(
+            "now evaluating sensor {:?} with nearest beacon {:?}",
+            sensor, beacon
+        );
         get_blocked_locations_on_line(sensor, distance, target_line, &mut all_locations);
     }
 
@@ -43,7 +46,12 @@ fn part1(input: &str) -> i64 {
     value as i64
 }
 
-fn get_blocked_locations_on_line(sensor: Location, distance: i64, line_y: i64, locations: &mut HashSet<Location>) {
+fn get_blocked_locations_on_line(
+    sensor: Location,
+    distance: i64,
+    line_y: i64,
+    locations: &mut HashSet<Location>,
+) {
     //println!("manhattan distance between sensor and beacon is {}", distance);
     let y_diff = (sensor.1 - line_y).abs();
     let location_offset = distance - y_diff;
@@ -62,7 +70,11 @@ fn get_blocked_locations_on_line(sensor: Location, distance: i64, line_y: i64, l
     }
 }
 
-fn get_allowed_locations_offset_1(sensor: Location, distance: i64, locations: &mut HashSet<Location>) {
+fn get_allowed_locations_offset_1(
+    sensor: Location,
+    distance: i64,
+    locations: &mut HashSet<Location>,
+) {
     //let mut locations = HashSet::new();
     // generate the diamond
 
@@ -97,8 +109,14 @@ fn get_allowed_locations_offset_1(sensor: Location, distance: i64, locations: &m
 fn parse_line(line: &str) -> (Location, Location) {
     let re = Regex::new(r"-?\d+").unwrap();
     let mut capture = re.find_iter(line);
-    let point_a: Location = (capture.next().unwrap().as_str().parse::<i64>().unwrap(), capture.next().unwrap().as_str().parse::<i64>().unwrap());
-    let point_b: Location = (capture.next().unwrap().as_str().parse::<i64>().unwrap(), capture.next().unwrap().as_str().parse::<i64>().unwrap());
+    let point_a: Location = (
+        capture.next().unwrap().as_str().parse::<i64>().unwrap(),
+        capture.next().unwrap().as_str().parse::<i64>().unwrap(),
+    );
+    let point_b: Location = (
+        capture.next().unwrap().as_str().parse::<i64>().unwrap(),
+        capture.next().unwrap().as_str().parse::<i64>().unwrap(),
+    );
     (point_a, point_b)
 }
 
@@ -119,22 +137,30 @@ fn part2(_input: &str) -> i64 {
     // distance is manhattan so sum x+y or less.
     let mut all_locations: HashSet<Location> = HashSet::new();
 
-
     // get all of the edges now find an edge that overlaps
     // let mut locs: HashMap<Location, u64>  = HashMap::new();
     // let mut test = HashSet::new();
     for (sensor, beacon, distance) in &pairs {
-        println!("now evaluating sensor {:?} with nearest beacon {:?}", sensor, beacon);
+        println!(
+            "now evaluating sensor {:?} with nearest beacon {:?}",
+            sensor, beacon
+        );
         get_allowed_locations_offset_1(*sensor, *distance, &mut all_locations);
     }
 
-    let limits = { if pairs.len() > 20 {4000000} else {10}};
+    let limits = {
+        if pairs.len() > 20 {
+            4000000
+        } else {
+            10
+        }
+    };
     // search locations on the edge of current beacon ranges
     // for each of those locations check if they are in range of a sensor, beacon pair
     //println!("found {} possible locations", all_locations.len());
-    let mut final_location : Location = (0,0);
+    let mut final_location: Location = (0, 0);
     'location: for location in all_locations {
-        if (location.0 < 0 || location.0 > limits || location.1 <0 || location.1 > limits) {
+        if (location.0 < 0 || location.0 > limits || location.1 < 0 || location.1 > limits) {
             continue 'location;
         }
 
@@ -145,20 +171,18 @@ fn part2(_input: &str) -> i64 {
             if ((location.0 - sensor.0).abs() + (location.1 - sensor.1).abs()) <= *distance {
                 //println!("evaluating {:?} but ignoring because distance smaller than {} to sensor {:?}", location, distance, sensor);
                 found = false;
-                break 'sensor
+                break 'sensor;
             }
         }
 
         if found {
             println!("allowed position at location {:?}", location);
             final_location = location;
-            break 'location
+            break 'location;
         }
     }
     final_location.0 * 4000000 + final_location.1
-
 }
-
 
 fn main() {
     // clear terminal
@@ -168,7 +192,7 @@ fn main() {
 
 #[cfg(test)]
 mod test {
-    use crate::{part1, part2, EXAMPLE, INPUT, parse_line};
+    use crate::{parse_line, part1, part2, EXAMPLE, INPUT};
 
     #[test]
     fn test_parse_line() {
