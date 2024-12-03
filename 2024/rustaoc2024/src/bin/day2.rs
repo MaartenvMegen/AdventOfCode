@@ -1,3 +1,5 @@
+use std::fs;
+
 #[derive(PartialEq)]
 enum SequenceState {
     Increasing,
@@ -94,7 +96,8 @@ fn part2(input: &str) -> u64 {
 }
 
 fn main() {
-    let example = include_str!(r"../../resources/day2-example.txt");
-    let input = include_str!(r"../../resources/day2-input.txt");
-    rustaoc2024::run_matrix(part1, part2, example, input);
+    let input = fs::read_to_string(r"../../resources/day2-input.txt").unwrap();
+    let example = fs::read_to_string(r"../../resources/day2-example.txt").unwrap();
+
+    rustaoc2024::run_matrix(part1, part2, &example, &input);
 }

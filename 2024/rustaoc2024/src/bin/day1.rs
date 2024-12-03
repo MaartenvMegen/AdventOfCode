@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fs;
 
 fn part1(input: &str) -> u64 {
     let parts: Vec<&str> = input.trim().split('\n').collect();
@@ -53,7 +54,7 @@ fn get_columns(parts: Vec<&str>) -> (Vec<i32>, Vec<i32>) {
 }
 
 fn main() {
-    let example = include_str!(r"../../resources/day1-example.txt");
-    let input = include_str!(r"../../resources/day1-input.txt");
-    rustaoc2024::run_matrix(part1, part2, example, input);
+    let input = fs::read_to_string(r"../../resources/day2-input.txt").unwrap();
+    let example = fs::read_to_string(r"../../resources/day2-example.txt").unwrap();
+    rustaoc2024::run_matrix(part1, part2, &example, &input);
 }
