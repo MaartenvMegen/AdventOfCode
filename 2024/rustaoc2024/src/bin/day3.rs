@@ -1,6 +1,6 @@
 use regex::Regex;
 
-fn calculate_mul_sum(memory: &str, track_do_dont : bool) -> i32 {
+fn calculate_mul_sum(memory: &str, track_do_dont: bool) -> i32 {
     let re = Regex::new(r"(mul\((\d+),(\d+)\))|(do\(\))|(don\'t\(\))").unwrap();
     let mut total_sum = 0;
     let mut mul_enabled = true;
@@ -28,7 +28,6 @@ fn main() {
     println!("Result part1: {}, Result part2: {}", part1, part2);
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -41,7 +40,11 @@ mod tests {
             ("mul(2,3)don't()mul(4,5)do()mul(6,7)", 68, 48),
             ("invalid_instruction mul(2,3) do() mul(4,5)", 26, 26),
             ("mul(2,3)mul(4,5)invalid_instruction", 26, 26),
-            ("xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))", 161, 48 ),
+            (
+                "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))",
+                161,
+                48,
+            ),
         ];
 
         for (input, expected_output_basic, expected_output_track) in test_cases {

@@ -1,4 +1,3 @@
-
 use std::fmt::Debug;
 use std::time::Instant;
 
@@ -21,7 +20,6 @@ where
         now.elapsed().as_millis()
     );
 }
-
 
 pub fn run_matrix<T: ?Sized, X>(part1: fn(&T) -> X, part2: fn(&T) -> X, example: &T, input: &T)
 where

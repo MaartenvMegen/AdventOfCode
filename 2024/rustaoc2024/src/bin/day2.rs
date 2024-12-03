@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 #[derive(PartialEq)]
 enum SequenceState {
     Increasing,
@@ -11,11 +10,9 @@ enum SequenceState {
 
 fn is_safe_sequence(levels: &[i32]) -> bool {
     let mut state = SequenceState::Start;
-    let mut prev = levels[0];
+    let mut prev = &levels[0];
 
-
-    for i in 1..levels.len() {
-        let curr = levels[i];
+    for curr in levels.iter().skip(1) {
         let diff = curr - prev;
 
         state = match diff {
@@ -28,9 +25,11 @@ fn is_safe_sequence(levels: &[i32]) -> bool {
             _ => SequenceState::Equal,
         };
 
-        if state == SequenceState::Mixed || state == SequenceState::ToBig || state == SequenceState::Equal {
+        if state == SequenceState::Mixed
+            || state == SequenceState::ToBig
+            || state == SequenceState::Equal
+        {
             return false;
-
         }
 
         prev = curr;
@@ -44,10 +43,10 @@ fn part1(input: &str) -> u64 {
     let mut safe_count = 0;
 
     for line in parts {
-        let mut iter = line.split_whitespace();
+        let iter = line.split_whitespace();
 
         let mut levels: Vec<i32> = Vec::new();
-        while let Some(num_str) = iter.next() {
+        for num_str in iter {
             levels.push(num_str.parse::<i32>().unwrap());
         }
 
@@ -64,10 +63,10 @@ fn part2(input: &str) -> u64 {
     let mut safe_count = 0;
 
     for line in parts {
-        let mut iter = line.split_whitespace();
+        let iter = line.split_whitespace();
 
         let mut levels: Vec<i32> = Vec::new();
-        while let Some(num_str) = iter.next() {
+        for num_str in iter {
             levels.push(num_str.parse::<i32>().unwrap());
         }
 
