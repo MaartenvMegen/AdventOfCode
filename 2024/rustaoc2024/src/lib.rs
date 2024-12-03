@@ -1,8 +1,14 @@
+mod pathfinder;
+
 use std::fmt::Debug;
 use std::time::Instant;
 
 pub fn create_chunks(input: &str) -> Vec<&str> {
     input.trim().split("\n\n").collect()
+}
+
+pub fn create_parts(input: &str) -> Vec<&str> {
+    input.trim().split('\n').collect()
 }
 
 pub fn run_timed<T, X>(f: fn(T) -> X, argument: T, description: &str)

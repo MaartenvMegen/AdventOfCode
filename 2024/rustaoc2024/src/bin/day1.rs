@@ -54,7 +54,7 @@ fn get_columns(parts: Vec<&str>) -> (Vec<i32>, Vec<i32>) {
 }
 
 fn main() {
-    let input = fs::read_to_string(r"../../resources/day2-input.txt").unwrap();
-    let example = fs::read_to_string(r"../../resources/day2-example.txt").unwrap();
+    let input = fs::read_to_string("2024/rustaoc2024/resources/day1-input.txt").unwrap();
+    let example = fs::read_to_string("2024/rustaoc2024/resources/day1-example.txt").unwrap();
     rustaoc2024::run_matrix(part1, part2, &example, &input);
 }

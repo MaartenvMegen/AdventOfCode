@@ -23,7 +23,7 @@ fn calculate_mul_sum(memory: &str, track_do_dont: bool) -> i32 {
 }
 
 fn main() {
-    let input = fs::read_to_string(r"../../resources/day3-input.txt").unwrap();
+    let input = fs::read_to_string("2024/rustaoc2024/resources/day3-input.txt").unwrap();
     let part1 = calculate_mul_sum(&input, false);
     let part2 = calculate_mul_sum(&input, true);
     println!("Result part1: {}, Result part2: {}", part1, part2);
