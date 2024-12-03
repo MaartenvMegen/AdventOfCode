@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 fn part1(input: &str) -> u64 {
     let parts: Vec<&str> = input.trim().split('\n').collect();
-    
+
     let mut col1: Vec<i32> = Vec::new();
     let mut col2: Vec<i32> = Vec::new();
 
