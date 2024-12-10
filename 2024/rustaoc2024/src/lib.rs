@@ -1,6 +1,8 @@
 mod pathfinder;
 
 use std::fmt::Debug;
+use std::fs;
+use std::str::FromStr;
 use std::time::Instant;
 
 pub fn create_chunks(input: &str) -> Vec<&str> {
@@ -35,4 +37,20 @@ where
     run_timed(part1, input, "part 1 input");
     run_timed(part2, example, "part 2 example");
     run_timed(part2, input, "part 2 input");
+}
+
+pub fn get_input(filename: &str) -> String {
+    fs::read_to_string("2024/rustaoc2024/resources/".to_owned() + filename).unwrap()
+}
+
+pub fn get_map_of_things<T: FromStr>(input: &str) -> Result<Vec<Vec<T>>, <T as FromStr>::Err> where <T as FromStr>::Err: Debug {
+    let mut grid = Vec::new();
+    for line in input.trim().split('\n') {
+        let row: Vec<T> = line
+            .chars()
+            .map(|c| c.to_string().parse::<T>().unwrap())
+            .collect();
+        grid.push(row);
+    }
+    Ok(grid)
 }
