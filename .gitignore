@@ -2,3 +2,5 @@
 *.pyc
 venv/*
 day*input.txt
+/target/*
+**/target/*

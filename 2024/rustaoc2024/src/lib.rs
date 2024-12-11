@@ -54,3 +54,39 @@ pub fn get_map_of_things<T: FromStr>(input: &str) -> Result<Vec<Vec<T>>, <T as F
     }
     Ok(grid)
 }
+
+pub fn print_grid<T>(grid: &[Vec<T>], to_char: fn(&T) -> char) {
+    println!("grid size:  {},{}", grid.len(), grid[0].len());
+    print!("┏");
+    for _ in 0..grid[0].len() {
+        print!("┳");
+    }
+    println!("┓");
+    for row in grid {
+        print!("┣");
+        for cell in row {
+            print!("{}", to_char(cell));
+        }
+        print!("┫");
+        println!();
+    }
+    print!("┗");
+    for _ in 0..grid[0].len() {
+        print!("┻");
+    }
+    println!("┛");
+}
+
+
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+    use super::*;
+
+    #[test]
+    fn test_print() {
+        let int_grid = [[1, 2, 3].to_vec(), [4, 5, 6].to_vec()].to_vec();
+        print_grid(&int_grid, |&n| char::from_digit(n as u32, 10).unwrap());
+    }
+}

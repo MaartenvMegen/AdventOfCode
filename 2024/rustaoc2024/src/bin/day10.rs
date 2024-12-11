@@ -1,13 +1,4 @@
-use rustaoc2024::{get_input, get_map_of_things};
-
-fn print_grid(grid: &[Vec<bool>]) {
-    for row in grid {
-        for cell in row {
-            print!("{}", if *cell { "#" } else { "." });
-        }
-        println!();
-    }
-}
+use rustaoc2024::{get_input, get_map_of_things, print_grid};
 
 fn dfs(
     map: &[Vec<usize>],
@@ -23,19 +14,26 @@ fn dfs(
 
     visited[row][col] = true;
     if height == 9 {
-        print_grid(visited);
+        print_grid(visited, |&n| if n { '#'} else { '.' });
         return 1;
     }
 
-    let mut score = 0;
-    for (dr, dc) in [(0, 1), (0, -1), (1, 0), (-1, 0)] {
-        let new_row = row as i32 + dr;
-        let new_col = col as i32 + dc;
-        if new_row >= 0 && new_row < map.len() as i32 && new_col >= 0 && new_col < map[0].len() as i32 {
-            score += dfs(map, visited, new_row as usize, new_col as usize, height + 1, allow_multipath);
-        }
-    }
-    score
+    [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        .iter()
+        .filter_map(|&(dr, dc)| {
+            let new_row = row as i32 + dr;
+            let new_col = col as i32 + dc;
+            if is_in_bounds(map, new_row, new_col) {
+                Some(dfs(map, visited, new_row as usize, new_col as usize, height + 1, allow_multipath))
+            } else {
+                None
+            }
+        })
+        .sum()
+}
+
+fn is_in_bounds(map: &[Vec<usize>], row: i32, col: i32) -> bool {
+    row >= 0 && row < map.len() as i32 && col >= 0 && col < map[0].len() as i32
 }
 
 fn find_trailheads(map: &[Vec<usize>], allow_multipath: bool) -> Vec<(usize, usize, usize)> {
@@ -76,18 +74,17 @@ fn part_b(input: &str) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
     use super::*;
 
     #[test]
     fn test_part_a() {
-        let example = fs::read_to_string(r"./resources/day10-example.txt").unwrap();
+        let example = include_str!(r"../../resources/day10-example.txt");
         assert_eq!(part_a(&example), 36);
     }
 
     #[test]
     fn test_part_b() {
-        let example = fs::read_to_string(r"./resources/day10-example.txt").unwrap();
+        let example = include_str!(r"../../resources/day10-example.txt");
         assert_eq!(part_b(&example), 81);
     }
 }
