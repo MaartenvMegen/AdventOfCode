@@ -81,7 +81,6 @@ pub fn print_grid<T>(grid: &[Vec<T>], to_char: fn(&T) -> char) {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
     use super::*;
 
     #[test]

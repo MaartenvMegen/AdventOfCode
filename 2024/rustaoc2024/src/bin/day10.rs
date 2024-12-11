@@ -79,12 +79,12 @@ mod tests {
     #[test]
     fn test_part_a() {
         let example = include_str!(r"../../resources/day10-example.txt");
-        assert_eq!(part_a(&example), 36);
+        assert_eq!(part_a(example), 36);
     }
 
     #[test]
     fn test_part_b() {
         let example = include_str!(r"../../resources/day10-example.txt");
-        assert_eq!(part_b(&example), 81);
+        assert_eq!(part_b(example), 81);
     }
 }
