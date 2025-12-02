@@ -65,7 +65,7 @@ fn simulate_blink(stone_counts: &HashMap<u64, u64>) -> HashMap<u64, u64> {
 }
 
 fn is_even_digits(number: u64) -> bool {
-    number.to_string().len() % 2 == 0
+    number.to_string().len().is_multiple_of(2)
 }
 
 #[cfg(test)]

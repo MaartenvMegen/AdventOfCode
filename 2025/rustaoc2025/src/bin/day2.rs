@@ -1,4 +1,4 @@
-use std::fs;
+use rustaoc2025::get_input;
 
 fn parse_range(s: &str) -> Result<(u64, u64), String> {
     let parts: Vec<&str> = s.split('-').collect();
@@ -27,7 +27,7 @@ fn is_valid_pt2(input: u64) -> bool {
 
     // A repeating pattern must evenly divide the length
     for pat_len in 1..=len / 2 {
-        if len % pat_len != 0 {
+        if !len.is_multiple_of(pat_len) {
             continue;
         }
 
@@ -45,7 +45,7 @@ fn is_valid_pt2(input: u64) -> bool {
 fn is_valid(input: u64) -> bool {
     let digits = input.to_string().len();
     // odd digits cant return a repeat
-    if digits % 2 != 0 {
+    if !digits.is_multiple_of(2) {
         return true;
     }
 
@@ -60,7 +60,7 @@ fn is_valid(input: u64) -> bool {
     let lower_part = input - downshifted * pow;
     lower_part != downshifted
 }
-fn solve(input: &str) -> u64 {
+fn solve(input: &str, is_valid: fn(u64)->bool) -> u64 {
     input
         .trim()
         .split(',')
@@ -70,7 +70,7 @@ fn solve(input: &str) -> u64 {
         .flat_map(|(lower, higher)| lower..=higher)
         // keep only invalid numbers
         .filter(|&number| {
-            let valid = is_valid_pt2(number);
+            let valid = is_valid(number);
             if !valid {
                 println!("{number} is invalid");
             }
@@ -80,9 +80,9 @@ fn solve(input: &str) -> u64 {
         .sum()
 }
 fn main() {
-    let input = fs::read_to_string("2025/rustaoc2025/resources/day2-input.txt").unwrap();
-    let example = fs::read_to_string("2025/rustaoc2025/resources/day2-example.txt").unwrap();
-    println!("{}", solve(input.as_str()));
+    let input = get_input("day2-example.txt");
+    println!("{}", solve(input.as_str(), is_valid));
+    println!("{}", solve(input.as_str(), is_valid_pt2));
 }
 
 #[cfg(test)]

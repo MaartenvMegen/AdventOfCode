@@ -1,4 +1,4 @@
-use std::fs;
+use rustaoc2025::get_input;
 
 #[derive(Debug)]
 enum Direction {
@@ -49,18 +49,17 @@ fn solve(input: &str) -> i64 {
             Direction::Left => {
                 let impact: i64 = if current_nr > parsed.value {
                     0
+                } else if current_nr == 0 {
+                    -(current_nr - parsed.value) / 100
                 } else {
-                    if current_nr == 0 {
-                        -(current_nr - parsed.value) / 100
-                    } else {
-                        1 - (current_nr - parsed.value) / 100
-                    }
+                    1 - (current_nr - parsed.value) / 100
                 };
+
                 println!("amount of zero crossings is {}", impact);
                 crossings += impact
             }
             Direction::Right => {
-                let impact: i64 = ((current_nr + parsed.value) / 100);
+                let impact: i64 = (current_nr + parsed.value) / 100;
                 println!("amount of zero crossings is {}", impact);
                 crossings += impact
             }
@@ -79,7 +78,6 @@ fn solve(input: &str) -> i64 {
     crossings
 }
 fn main() {
-    let input = fs::read_to_string("2025/rustaoc2025/resources/day1-input.txt").unwrap();
-    let example = fs::read_to_string("2025/rustaoc2025/resources/day1-example.txt").unwrap();
+    let input = get_input("day1-example.txt");
     println!("{}", solve(input.as_str()));
 }

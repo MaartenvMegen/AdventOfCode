@@ -1,4 +1,3 @@
-use std::fs;
 use rustaoc2024::get_input;
 
 
@@ -6,7 +5,7 @@ fn part_b(input: &str) -> i64 {
 
     let lines: Vec<&str> = input.lines().collect();
     // Parse registers
-    let reg_a = lines[0][12..].parse::<i64>().unwrap();
+    let _reg_a = lines[0][12..].parse::<i64>().unwrap();
     let reg_b = lines[1][12..].parse::<i64>().unwrap();
     let reg_c = lines[2][12..].parse::<i64>().unwrap();
     // Parse program
@@ -15,17 +14,15 @@ fn part_b(input: &str) -> i64 {
         .map(|x| x.trim().parse::<i64>().unwrap())
         .collect();
 
-    let mut sum = 0;
+    let mut _sum = 0;
     for (index, bit) in program.iter().enumerate() {
-        let bit_value = bit << (index)* 3;
-        sum += bit_value;
+        let bit_value = bit << ((index)* 3);
+        _sum += bit_value;
         // println!("bit value = {} achieved by shifting {} by {} bits", bit_value, bit, index * 3);
     }
     // println!("({})", sum);
     println!("searching for input for program {:?}", program);
-    if let Some(value) = find_lowest_a(0, reg_b, reg_c, &*program, 1) {
-        value
-    } else { 0 }
+    find_lowest_a(0, reg_b, reg_c, &program, 1).unwrap_or_default()
 }
 
 fn find_lowest_a(a: i64, b: i64, c: i64, program: &[i64], depth : usize) -> Option<i64> {
@@ -33,7 +30,7 @@ fn find_lowest_a(a: i64, b: i64, c: i64, program: &[i64], depth : usize) -> Opti
     if depth > program.len() {
         return None;
     }
-    let mut a = a << 3;
+    let a = a << 3;
         for check in 0..64 {
             let output = simulate(a+check, b, c, program);
             let correct = output.iter().rev().enumerate().all( | (index, value) | program[program.len() - index - 1] == *value);
@@ -93,7 +90,7 @@ fn simulate(mut a: i64, mut b: i64, mut c: i64, program: &[i64]) -> Vec<i64> {
                 ip += 2;
             }
             1 => { // bxl
-                b ^= operand as i64;
+                b ^= operand;
                 ip += 2;
             }
             2 => { // bst
@@ -134,7 +131,7 @@ fn simulate(mut a: i64, mut b: i64, mut c: i64, program: &[i64]) -> Vec<i64> {
 
 fn combo_value(operand: i64, a: i64, b: i64, c: i64) -> i64 {
     match operand {
-        0..=3 => operand as i64,
+        0..=3 => operand,
         4 => a,
         5 => b,
         6 => c,

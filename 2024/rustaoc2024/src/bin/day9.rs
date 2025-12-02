@@ -102,11 +102,11 @@ fn parse_disk_map(disk_map: &str) -> Vec<Option<usize>> {
 
         match index % 2 {
             0 => {
-                result.extend(std::iter::repeat(Some(file_id)).take(size));
+                result.extend(std::iter::repeat_n(Some(file_id), size));
                 file_id += 1;
             }
             1 => {
-                result.extend(std::iter::repeat(None).take(size));
+                result.extend(std::iter::repeat_n(None, size));
             }
             _ => unreachable!(), // Should never happen
         }
