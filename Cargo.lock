@@ -91,3 +91,7 @@ dependencies = [
  "petgraph",
  "regex",
 ]
+
+[[package]]
+name = "rustaoc2025"
+version = "0.1.0"
