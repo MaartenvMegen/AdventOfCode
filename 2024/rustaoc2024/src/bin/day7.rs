@@ -6,13 +6,15 @@ const OPERATIONS_B: &[fn(u64, u64) -> u64] = &[
     |a, b| a * 10_u64.pow(b.to_string().len() as u32) + b,
 ];
 
-const OPERATIONS_A: &[fn(u64, u64) -> u64] = &[
-    |a, b| a + b,
-    |a, b| a * b,
-];
+const OPERATIONS_A: &[fn(u64, u64) -> u64] = &[|a, b| a + b, |a, b| a * b];
 
-
-fn can_solve(numbers: &[u64], target: u64, instructions: &[fn(u64, u64) -> u64], current_score: u64, index: usize) -> bool {
+fn can_solve(
+    numbers: &[u64],
+    target: u64,
+    instructions: &[fn(u64, u64) -> u64],
+    current_score: u64,
+    index: usize,
+) -> bool {
     if index == numbers.len() {
         return current_score == target;
     }
@@ -37,7 +39,7 @@ fn part_b(input: &str) -> u64 {
     get_sum_valid_input(input, OPERATIONS_B)
 }
 
-fn get_sum_valid_input(input: &str, operations : &[fn(u64, u64) -> u64]) -> u64 {
+fn get_sum_valid_input(input: &str, operations: &[fn(u64, u64) -> u64]) -> u64 {
     let equations = input_to_instructions(input);
     let mut sum = 0;
 
@@ -81,16 +83,14 @@ mod tests {
 
     #[test]
     fn test_can_solve() {
-        let (target, numbers) = (292, vec![11, 6 ,16, 20]);
+        let (target, numbers) = (292, vec![11, 6, 16, 20]);
         assert!(can_solve(&numbers, target, OPERATIONS_A, 0, 0));
-
     }
 
     #[test]
     fn test_can_solve_192() {
-        let (target, numbers) = (192, vec![17, 8 ,14]);
+        let (target, numbers) = (192, vec![17, 8, 14]);
         assert!(can_solve(&numbers, target, OPERATIONS_B, 0, 0));
-
     }
 
     #[test]

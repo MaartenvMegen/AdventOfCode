@@ -43,7 +43,10 @@ pub fn get_input(filename: &str) -> String {
     fs::read_to_string("2024/rustaoc2024/resources/".to_owned() + filename).unwrap()
 }
 
-pub fn get_map_of_things<T: FromStr>(input: &str) -> Result<Vec<Vec<T>>, <T as FromStr>::Err> where <T as FromStr>::Err: Debug {
+pub fn get_map_of_things<T: FromStr>(input: &str) -> Result<Vec<Vec<T>>, <T as FromStr>::Err>
+where
+    <T as FromStr>::Err: Debug,
+{
     let mut grid = Vec::new();
     for line in input.trim().split('\n') {
         let row: Vec<T> = line
@@ -76,8 +79,6 @@ pub fn print_grid<T>(grid: &[Vec<T>], to_char: fn(&T) -> char) {
     }
     println!("┛");
 }
-
-
 
 #[cfg(test)]
 mod tests {

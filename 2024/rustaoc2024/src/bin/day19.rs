@@ -1,26 +1,16 @@
-use std::collections::HashMap;
 use rustaoc2024::get_input;
+use std::collections::HashMap;
 
 // Parse input into towel patterns and designs
 fn parse_input(input: &str) -> (Vec<String>, Vec<String>) {
     let parts: Vec<&str> = input.split("\n\n").collect();
-    let patterns = parts[0]
-        .split(',')
-        .map(|s| s.trim().to_string())
-        .collect();
-    let designs = parts[1]
-        .lines()
-        .map(|s| s.trim().to_string())
-        .collect();
+    let patterns = parts[0].split(',').map(|s| s.trim().to_string()).collect();
+    let designs = parts[1].lines().map(|s| s.trim().to_string()).collect();
     (patterns, designs)
 }
 
 // Check if a design can be constructed using the towel patterns
-fn can_construct(
-    design: &str,
-    patterns: &[String],
-    memo: &mut HashMap<String, bool>,
-) -> bool {
+fn can_construct(design: &str, patterns: &[String], memo: &mut HashMap<String, bool>) -> bool {
     // Base case: if the design is empty, it's valid
     if design.is_empty() {
         return true;
@@ -75,7 +65,8 @@ mod tests {
 
     #[test]
     fn example_test() {
-        let input = "r, wr, b, g, bwu, rb, gb, br\n\nbrwrr\nbggr\ngbbr\nrrbgbr\nubwu\nbwurrg\nbrgr\nbbrgwb";
+        let input =
+            "r, wr, b, g, bwu, rb, gb, br\n\nbrwrr\nbggr\ngbbr\nrrbgbr\nubwu\nbwurrg\nbrgr\nbbrgwb";
         assert_eq!(count_possible_designs(input), 6);
     }
 }

@@ -60,7 +60,7 @@ fn is_valid(input: u64) -> bool {
     let lower_part = input - downshifted * pow;
     lower_part != downshifted
 }
-fn solve(input: &str, is_valid: fn(u64)->bool) -> u64 {
+fn solve(input: &str, is_valid: fn(u64) -> bool) -> u64 {
     input
         .trim()
         .split(',')

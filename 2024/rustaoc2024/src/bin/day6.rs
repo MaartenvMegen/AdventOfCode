@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 use std::fs;
 
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Position {
     x: usize,
@@ -65,8 +64,7 @@ fn simulate_guard(grid: &[Vec<char>]) -> (usize, bool) {
             Direction::Right => {
                 if guard_pos.x == cols - 1 {
                     wandering = false;
-                }
-                else if grid[guard_pos.y][guard_pos.x + 1] == '#' {
+                } else if grid[guard_pos.y][guard_pos.x + 1] == '#' {
                     guard_dir = Direction::Down;
                 } else {
                     guard_pos.x += 1;
@@ -79,10 +77,9 @@ fn simulate_guard(grid: &[Vec<char>]) -> (usize, bool) {
                 }
             }
             Direction::Down => {
-                if guard_pos.y == rows -1 {
+                if guard_pos.y == rows - 1 {
                     wandering = false;
-                }
-                else if grid[guard_pos.y + 1][guard_pos.x] == '#' {
+                } else if grid[guard_pos.y + 1][guard_pos.x] == '#' {
                     guard_dir = Direction::Left;
                 } else {
                     guard_pos.y += 1;
@@ -97,8 +94,7 @@ fn simulate_guard(grid: &[Vec<char>]) -> (usize, bool) {
             Direction::Left => {
                 if guard_pos.x == 0 {
                     wandering = false;
-                }
-                else if grid[guard_pos.y][guard_pos.x - 1] == '#' {
+                } else if grid[guard_pos.y][guard_pos.x - 1] == '#' {
                     guard_dir = Direction::Up;
                 } else {
                     guard_pos.x -= 1;
@@ -116,7 +112,6 @@ fn simulate_guard(grid: &[Vec<char>]) -> (usize, bool) {
     (visited.len(), loop_detected)
 }
 
-
 fn part_a(input: &str) -> usize {
     let grid = parse_grid(input).unwrap();
     print_grid(&grid);
@@ -129,9 +124,8 @@ fn part_b(input: &str) -> usize {
     loop_searcher(&grid)
 }
 
-
 fn parse_grid(input: &str) -> Result<Vec<Vec<char>>, std::io::Error> {
-    let lines : Vec<&str>= input.trim().split("\n").collect();
+    let lines: Vec<&str> = input.trim().split("\n").collect();
 
     let mut grid = Vec::new();
     for line in lines {
@@ -160,7 +154,6 @@ fn deep_clone_grid(grid: &[Vec<char>]) -> Vec<Vec<char>> {
 }
 
 fn loop_searcher(grid: &[Vec<char>]) -> usize {
-
     let mut loops = 0;
     for i in 0..grid.len() {
         for j in 0..grid[0].len() {
@@ -181,14 +174,11 @@ fn main() {
     let _input = fs::read_to_string(r"2024/rustaoc2024/resources/day6-input.txt").unwrap();
 
     let positions = part_a(&example);
-    println!("The guard visits {} positions.",positions);
+    println!("The guard visits {} positions.", positions);
     println!("searching loops");
     let loops = part_b(&example);
     println!("There are {} loops", loops);
 }
-
-
-
 
 #[cfg(test)]
 mod tests {
@@ -197,12 +187,12 @@ mod tests {
     #[test]
     fn test_part1() {
         let example = fs::read_to_string(r"./resources/day6-example.txt").unwrap();
-        assert_eq!(part_a(&example),41);
+        assert_eq!(part_a(&example), 41);
     }
 
     #[test]
     fn test_part2() {
         let example = fs::read_to_string(r"./resources/day6-example.txt").unwrap();
-        assert_eq!(part_b(&example),6);
+        assert_eq!(part_b(&example), 6);
     }
 }

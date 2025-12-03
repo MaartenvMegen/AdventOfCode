@@ -1,11 +1,9 @@
-
-
 #[cfg(test)]
 mod tests {
     use petgraph::dot::{Config, Dot};
     use petgraph::graphmap::UnGraphMap;
     use petgraph::prelude::EdgeRef;
-    
+
     #[test]
     fn example2() {
         use petgraph::algo::dijkstra;
@@ -60,5 +58,4 @@ mod tests {
             println!("No path found.");
         }
     }
-
 }

@@ -1,4 +1,4 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 use std::fs;
 
 fn part_b(input: &str) -> usize {
@@ -27,7 +27,10 @@ fn get_freq_map(grid: &[Vec<char>]) -> HashMap<char, Vec<(usize, usize)>> {
     freq_map
 }
 
-fn count_antinodes_b(grid: &[Vec<char>], freq_map: &HashMap<char, Vec<(usize, usize)>>) -> HashSet<(usize, usize)> {
+fn count_antinodes_b(
+    grid: &[Vec<char>],
+    freq_map: &HashMap<char, Vec<(usize, usize)>>,
+) -> HashSet<(usize, usize)> {
     let mut antinodes = HashSet::new();
     for (_, antennas) in freq_map.iter() {
         for i in 0..antennas.len() - 1 {
@@ -47,12 +50,20 @@ fn count_antinodes_b(grid: &[Vec<char>], freq_map: &HashMap<char, Vec<(usize, us
                 let mut new_loc_y2 = y2 as i32 + dy;
 
                 // while not out of bounds
-                while new_loc_x1 >= 0 && new_loc_x1 < grid[0].len() as i32 && new_loc_y1 >= 0 && new_loc_y1 < grid.len() as i32 {
+                while new_loc_x1 >= 0
+                    && new_loc_x1 < grid[0].len() as i32
+                    && new_loc_y1 >= 0
+                    && new_loc_y1 < grid.len() as i32
+                {
                     antinodes.insert((new_loc_x1 as usize, new_loc_y1 as usize));
                     new_loc_x1 -= dx;
                     new_loc_y1 -= dy;
                 }
-                while new_loc_x2 >= 0 && new_loc_x2 < grid[0].len() as i32 && new_loc_y2 >= 0 && new_loc_y2 < grid.len() as i32 {
+                while new_loc_x2 >= 0
+                    && new_loc_x2 < grid[0].len() as i32
+                    && new_loc_y2 >= 0
+                    && new_loc_y2 < grid.len() as i32
+                {
                     antinodes.insert((new_loc_x2 as usize, new_loc_y2 as usize));
                     new_loc_x2 += dx;
                     new_loc_y2 += dy;
@@ -63,7 +74,10 @@ fn count_antinodes_b(grid: &[Vec<char>], freq_map: &HashMap<char, Vec<(usize, us
     antinodes
 }
 
-fn count_antinodes_a(grid: &[Vec<char>], freq_map: &HashMap<char, Vec<(usize, usize)>>) -> HashSet<(usize, usize)> {
+fn count_antinodes_a(
+    grid: &[Vec<char>],
+    freq_map: &HashMap<char, Vec<(usize, usize)>>,
+) -> HashSet<(usize, usize)> {
     let mut antinodes = HashSet::new();
     for (_, antennas) in freq_map.iter() {
         for i in 0..antennas.len() - 1 {
@@ -81,10 +95,18 @@ fn count_antinodes_a(grid: &[Vec<char>], freq_map: &HashMap<char, Vec<(usize, us
                 let new_loc_y2 = y2 as i32 + dy;
 
                 // while not out of bounds
-                if new_loc_x1 >= 0 && new_loc_x1 < grid[0].len() as i32 && new_loc_y1 >= 0 && new_loc_y1 < grid.len() as i32 {
+                if new_loc_x1 >= 0
+                    && new_loc_x1 < grid[0].len() as i32
+                    && new_loc_y1 >= 0
+                    && new_loc_y1 < grid.len() as i32
+                {
                     antinodes.insert((new_loc_x1 as usize, new_loc_y1 as usize));
                 }
-                if new_loc_x2 >= 0 && new_loc_x2 < grid[0].len() as i32 && new_loc_y2 >= 0 && new_loc_y2 < grid.len() as i32 {
+                if new_loc_x2 >= 0
+                    && new_loc_x2 < grid[0].len() as i32
+                    && new_loc_y2 >= 0
+                    && new_loc_y2 < grid.len() as i32
+                {
                     antinodes.insert((new_loc_x2 as usize, new_loc_y2 as usize));
                 }
             }

@@ -1,5 +1,5 @@
-use std::collections::{HashSet, VecDeque};
 use rustaoc2024::get_input;
+use std::collections::{HashSet, VecDeque};
 
 fn main() {
     let input = get_input("day12-input.txt");
@@ -8,10 +8,7 @@ fn main() {
 }
 
 fn part_a(input: &str) -> u64 {
-    let grid: Vec<Vec<char>> = input
-        .lines()
-        .map(|line| line.chars().collect())
-        .collect();
+    let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
 
     let rows = grid.len();
     let cols = grid[0].len();
@@ -52,7 +49,11 @@ fn explore_region(
             let new_r = r as isize + dr;
             let new_c = c as isize + dc;
 
-            if new_r < 0 || new_r >= grid.len() as isize || new_c < 0 || new_c >= grid[0].len() as isize {
+            if new_r < 0
+                || new_r >= grid.len() as isize
+                || new_c < 0
+                || new_c >= grid[0].len() as isize
+            {
                 perimeter += 1; // Edge of the grid
             } else {
                 let new_r = new_r as usize;
@@ -71,12 +72,8 @@ fn explore_region(
 }
 
 fn part_b(input: &str) -> u64 {
-    let grid: Vec<Vec<char>> = input
-        .lines()
-        .map(|line| line.chars().collect())
-        .collect();
+    let grid: Vec<Vec<char>> = input.lines().map(|line| line.chars().collect()).collect();
     calculate_total_price(&grid)
-
 }
 
 fn calculate_total_price(grid: &[Vec<char>]) -> u64 {
@@ -116,7 +113,9 @@ fn flood_fill_and_corners(
         // Check each corner of the current cell
         let mut count = 0;
         for corner in cell_corners(r, c) {
-            if is_outer_corner(grid, r, c, corner, region_char) || is_inner_corner(grid, r, c, corner, region_char) {
+            if is_outer_corner(grid, r, c, corner, region_char)
+                || is_inner_corner(grid, r, c, corner, region_char)
+            {
                 corners.insert(corner);
                 count += 1;
             }
@@ -155,9 +154,9 @@ fn neighbors(r: usize, c: usize, rows: usize, cols: usize) -> Vec<(usize, usize)
 
 fn cell_corners(r: usize, c: usize) -> Vec<(usize, usize)> {
     vec![
-        (r, c),       // Top-left corner
-        (r, c + 1),   // Top-right corner
-        (r + 1, c),   // Bottom-left corner
+        (r, c),         // Top-left corner
+        (r, c + 1),     // Top-right corner
+        (r + 1, c),     // Bottom-left corner
         (r + 1, c + 1), // Bottom-right corner
     ]
 }
@@ -169,33 +168,34 @@ fn is_outer_corner(
     corner: (usize, usize),
     region_char: char,
 ) -> bool {
-
     // Top-left corner conditions
     if corner == (r, c) {
-        return (r == 0 || grid[r - 1][c] != region_char) &&
-            (c == 0 || grid[r][c - 1] != region_char) &&
-            (r == 0 || c == 0 || grid[r - 1][c - 1] != region_char);
+        return (r == 0 || grid[r - 1][c] != region_char)
+            && (c == 0 || grid[r][c - 1] != region_char)
+            && (r == 0 || c == 0 || grid[r - 1][c - 1] != region_char);
     }
 
     // Top-right corner conditions
     if corner == (r, c + 1) {
-        return (r == 0 || grid[r - 1][c] != region_char) &&
-            (c + 1 >= grid[0].len() || grid[r][c + 1] != region_char) &&
-            (r == 0 || c + 1 >= grid[0].len() || grid[r - 1][c + 1] != region_char);
+        return (r == 0 || grid[r - 1][c] != region_char)
+            && (c + 1 >= grid[0].len() || grid[r][c + 1] != region_char)
+            && (r == 0 || c + 1 >= grid[0].len() || grid[r - 1][c + 1] != region_char);
     }
 
     // Bottom-left corner conditions
     if corner == (r + 1, c) {
-        return (r + 1 >= grid.len() || grid[r + 1][c] != region_char) &&
-            (c == 0 || grid[r][c - 1] != region_char) &&
-            (r + 1 >= grid.len() || c == 0 || grid[r + 1][c - 1] != region_char);
+        return (r + 1 >= grid.len() || grid[r + 1][c] != region_char)
+            && (c == 0 || grid[r][c - 1] != region_char)
+            && (r + 1 >= grid.len() || c == 0 || grid[r + 1][c - 1] != region_char);
     }
 
     // Bottom-right corner conditions
     if corner == (r + 1, c + 1) {
-        return (r + 1 >= grid.len() || grid[r + 1][c] != region_char) &&
-            (c + 1 >= grid[0].len() || grid[r][c + 1] != region_char) &&
-            (r + 1 >= grid.len() || c + 1 >= grid[0].len() || grid[r + 1][c + 1] != region_char);
+        return (r + 1 >= grid.len() || grid[r + 1][c] != region_char)
+            && (c + 1 >= grid[0].len() || grid[r][c + 1] != region_char)
+            && (r + 1 >= grid.len()
+                || c + 1 >= grid[0].len()
+                || grid[r + 1][c + 1] != region_char);
     }
 
     false
@@ -208,7 +208,6 @@ fn is_inner_corner(
     corner: (usize, usize),
     region_char: char,
 ) -> bool {
-
     // Top-left inner corner conditions
     // Contains logic bug
     // if corner == (r, c) {
@@ -217,26 +216,36 @@ fn is_inner_corner(
     // }
 
     if corner == (r, c) {
-        return r > 0 && c > 0 &&
-            grid[r - 1][c - 1] != region_char &&
-            grid[r][c - 1]     != region_char;
+        return r > 0
+            && c > 0
+            && grid[r - 1][c - 1] != region_char
+            && grid[r][c - 1] != region_char;
     }
 
     // Top-right inner corner conditions
     if corner == (r, c + 1) {
-        return (c + 1 < grid[0].len() && grid[r][c+1] == region_char) &&
-            (r > 0 && grid[r-1][c] != region_char) &&
-            (r + 1 < grid.len() && c + 1 < grid[0].len() && grid[r + 1][c + 1] == region_char);
+        return (c + 1 < grid[0].len() && grid[r][c + 1] == region_char)
+            && (r > 0 && grid[r - 1][c] != region_char)
+            && (r + 1 < grid.len() && c + 1 < grid[0].len() && grid[r + 1][c + 1] == region_char);
     }
 
     // Bottom-left inner corner conditions
     if corner == (r + 1, c) {
-        return r > 0 && grid[r-1][c] != region_char && c > 0 && grid[r][c - 1] == region_char && grid[r - 1][c - 1] == region_char;
+        return r > 0
+            && grid[r - 1][c] != region_char
+            && c > 0
+            && grid[r][c - 1] == region_char
+            && grid[r - 1][c - 1] == region_char;
     }
 
     // Bottom-right inner corner conditions
     if corner == (r + 1, c + 1) {
-        return c+1 < grid[0].len() && grid[r][c+1] == region_char && r > 0 && grid[r-1][c] != region_char && c + 1 < grid[0].len() && grid[r - 1][c+1] == region_char;
+        return c + 1 < grid[0].len()
+            && grid[r][c + 1] == region_char
+            && r > 0
+            && grid[r - 1][c] != region_char
+            && c + 1 < grid[0].len()
+            && grid[r - 1][c + 1] == region_char;
     }
 
     false
@@ -257,4 +266,3 @@ mod tests {
     //     assert_eq!(part_b(EXAMPLE), 1206);
     // }
 }
-

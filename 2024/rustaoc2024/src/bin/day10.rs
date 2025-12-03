@@ -8,13 +8,13 @@ fn dfs(
     height: usize,
     allow_multipath: bool,
 ) -> usize {
-    if map[row][col] != height  || (visited[row][col] && !allow_multipath) {
+    if map[row][col] != height || (visited[row][col] && !allow_multipath) {
         return 0;
     }
 
     visited[row][col] = true;
     if height == 9 {
-        print_grid(visited, |&n| if n { '#'} else { '.' });
+        print_grid(visited, |&n| if n { '#' } else { '.' });
         return 1;
     }
 
@@ -24,7 +24,14 @@ fn dfs(
             let new_row = row as i32 + dr;
             let new_col = col as i32 + dc;
             if is_in_bounds(map, new_row, new_col) {
-                Some(dfs(map, visited, new_row as usize, new_col as usize, height + 1, allow_multipath))
+                Some(dfs(
+                    map,
+                    visited,
+                    new_row as usize,
+                    new_col as usize,
+                    height + 1,
+                    allow_multipath,
+                ))
             } else {
                 None
             }
