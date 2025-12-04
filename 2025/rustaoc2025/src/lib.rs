@@ -1,3 +1,5 @@
+pub mod grid;
+
 use std::fs;
 
 pub fn get_input(filename: &str) -> String {
