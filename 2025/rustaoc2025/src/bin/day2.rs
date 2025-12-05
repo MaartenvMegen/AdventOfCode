@@ -1,24 +1,4 @@
-use rustaoc2025::get_input;
-
-fn parse_range(s: &str) -> Result<(u64, u64), String> {
-    let parts: Vec<&str> = s.split('-').collect();
-
-    if parts.len() != 2 {
-        return Err("Expected format: <num>-<num>".into());
-    }
-
-    let a = parts[0]
-        .trim()
-        .parse::<u64>()
-        .map_err(|_| format!("Invalid number '{}'", parts[0]))?;
-
-    let b = parts[1]
-        .trim()
-        .parse::<u64>()
-        .map_err(|_| format!("Invalid number '{}'", parts[1]))?;
-
-    Ok((a, b))
-}
+use rustaoc2025::{get_input, parse_range};
 
 fn is_valid_pt2(input: u64) -> bool {
     // a string based approach seems most efficient
