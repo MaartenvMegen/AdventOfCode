@@ -1,6 +1,6 @@
 use rustaoc2025::get_input;
 use rustaoc2025::grid::{Grid, Point};
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 use std::fmt;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -35,63 +35,7 @@ impl fmt::Debug for Cell {
     }
 }
 
-fn solve(input: &str) -> usize {
-    let mut grid: Grid<Cell> = Grid::parse_to_grid(input, |c| Cell::from_char(c).unwrap());
-    let (source, _cell) = grid
-        .get_map()
-        .iter()
-        .find(|(_location, object)| **object == Cell::Start)
-        .unwrap();
-
-    let mut beamfront: HashSet<Point> = HashSet::new();
-    beamfront.insert(*source);
-
-    let mut splits: u64 = 0;
-
-    // al beams have point y at grid max
-    while !beamfront.is_empty() {
-        // check down loc, if empty move if splitter create 2 new beams
-        let search_list = beamfront.clone();
-        beamfront.clear();
-
-        search_list.iter().for_each(|point| {
-            let new_loc = Point::new(point.x, point.y + 1);
-            match Grid::get_value(&grid, &new_loc) {
-                Some(Cell::Empty) => {
-                    beamfront.insert(new_loc);
-                    grid.update_loc(new_loc, Cell::Beam)
-                }
-                Some(Cell::Beam) => {
-                    // nothing to do, we have been here already
-                }
-                Some(Cell::Start) => {
-                    // how did we end up at the start?
-                }
-                Some(Cell::Splitter) => {
-                    splits += 1;
-                    if point.x < grid.xmax {
-                        let new_point = Point::new(point.x + 1, point.y + 1);
-                        beamfront.insert(new_point);
-                        grid.update_loc(new_point, Cell::Beam)
-                    }
-                    if point.x > 0 {
-                        let new_point = Point::new(point.x - 1, point.y + 1);
-                        beamfront.insert(new_point);
-                        grid.update_loc(new_point, Cell::Beam)
-                    }
-                }
-                None => {
-                    // nothing to do end of y postions
-                }
-            }
-        })
-    }
-
-    grid.print_grid();
-    splits as usize
-}
-
-fn solve2(input: &str) -> u64 {
+fn solve(input: &str) -> (u64, u64) {
     let grid: Grid<Cell> = Grid::parse_to_grid(input, |c| Cell::from_char(c).unwrap());
     let (source, _cell) = grid
         .get_map()
@@ -99,7 +43,8 @@ fn solve2(input: &str) -> u64 {
         .find(|(_location, object)| **object == Cell::Start)
         .unwrap();
     let mut memory: HashMap<Point, u64> = HashMap::new();
-    find_timelines(&grid, source, &mut memory)
+    let timelines = find_timelines(&grid, source, &mut memory);
+    (memory.len() as u64, timelines)
 }
 
 fn find_timelines(
@@ -119,7 +64,6 @@ fn find_timelines(
         }
         Some(Cell::Splitter) => {
             let mut timelines = 0;
-            println!("timeline at point: {}", current_point);
             if current_point.x < grid.xmax {
                 let new_point = Point::new(current_point.x + 1, current_point.y + 1);
                 timelines += find_timelines(grid, &new_point, memory)
@@ -140,6 +84,9 @@ fn find_timelines(
 
 fn main() {
     let input = get_input("day7-input.txt");
-    println!("{}", solve(&input));
-    println!("{}", solve2(&input));
+    let (branches, timelines) = solve(&input);
+    println!(
+        "timeline has {} branches resulting in {} timelines",
+        branches, timelines
+    );
 }
