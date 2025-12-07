@@ -2,7 +2,8 @@ use rustaoc2025::get_input;
 use std::fmt::Debug;
 
 fn rotate_clockwise<T>(matrix: &[Vec<T>], padding: T) -> Vec<Vec<T>>
-where T: Copy + Debug
+where
+    T: Copy + Debug,
 {
     let rows = matrix.len();
     if rows == 0 {

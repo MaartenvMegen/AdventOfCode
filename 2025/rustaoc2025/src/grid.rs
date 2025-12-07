@@ -5,12 +5,12 @@ use std::ops::Add;
 
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub struct Point {
-    x: isize,
-    y: isize,
+    pub x: isize,
+    pub y: isize,
 }
 
 impl Point {
-    pub(crate) fn new(x: isize, y: isize) -> Point {
+    pub fn new(x: isize, y: isize) -> Point {
         Point { x, y }
     }
 }
