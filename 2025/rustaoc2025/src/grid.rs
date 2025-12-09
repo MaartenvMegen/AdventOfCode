@@ -13,6 +13,22 @@ impl Point {
     pub fn new(x: isize, y: isize) -> Point {
         Point { x, y }
     }
+
+    pub fn parse(s: &str) -> Result<Self, String> {
+        let parts: Vec<&str> = s.trim().split(',').collect();
+        if parts.len() != 2 {
+            return Err(format!("invalid point format: '{}'", s));
+        }
+
+        let x = parts[0]
+            .parse::<isize>()
+            .map_err(|_| format!("invalid x in '{}'", s))?;
+        let y = parts[1]
+            .parse::<isize>()
+            .map_err(|_| format!("invalid y in '{}'", s))?;
+
+        Ok(Point { x, y })
+    }
 }
 
 impl Display for Point {
@@ -34,8 +50,19 @@ pub struct Grid<T> {
     map: HashMap<Point, T>,
     pub xmax: isize,
     pub ymax: isize,
-    ymin: isize,
-    xmin: isize,
+    pub ymin: isize,
+    pub xmin: isize,
+}
+
+impl<T> Default for Grid<T>
+where
+    T: Debug,
+    T: Clone,
+    T: Copy,
+{
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl<T> Grid<T>
@@ -44,7 +71,7 @@ where
     T: Clone,
     T: Copy,
 {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             map: HashMap::new(),
             xmax: 0,

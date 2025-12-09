@@ -175,6 +175,7 @@ fn solve2(input: &str) -> usize {
 
     let mut distance_iter = distance_list.into_iter().skip(1);
     // Print
+    let mut answer = 0;
 
     while count_occurrences(circuits.values())
         .into_iter()
@@ -239,10 +240,11 @@ fn solve2(input: &str) -> usize {
                 p2,
                 p1.x * p2.x
             );
+            answer = p1.x * p2.x;
             break;
         }
     }
-    0
+    answer as usize
 }
 
 fn count_occurrences(list: Values<Point3, u64>) -> Vec<usize> {
