@@ -1,20 +1,9 @@
 use crate::Tile::{Green, Red, Unsupported};
-use rustaoc2025::get_input;
-use rustaoc2025::grid::{Grid, Point};
+use rustaoc2025::grid::{Grid, Point, DIRS8};
+use rustaoc2025::{get_input, run_timed};
 use std::cmp::PartialEq;
 use std::collections::{HashSet, VecDeque};
 use std::fmt;
-
-const DIRS8: [(isize, isize); 8] = [
-    (1, 0),   // right
-    (-1, 0),  // left
-    (0, 1),   // down
-    (0, -1),  // up
-    (1, 1),   // down-right
-    (1, -1),  // up-right
-    (-1, 1),  // down-left
-    (-1, -1), // up-left
-];
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Tile {
@@ -78,10 +67,8 @@ fn is_valid_area(grid: &Grid<Tile>, p1: Point, p2: Point) -> bool {
             return false;
         }
         // top (avoid duplicate when height == 0)
-        if max_y != min_y {
-            if grid.get_value(&Point { x, y: max_y }) == Some(&Unsupported) {
-                return false;
-            }
+        if max_y != min_y && grid.get_value(&Point { x, y: max_y }) == Some(&Unsupported) {
+            return false;
         }
     }
 
@@ -170,16 +157,6 @@ fn flood_outside_band(grid: &mut Grid<Tile>) {
                 y: p.y + dy,
             };
 
-            // Optional: clamp this to some reasonable envelope around the loop
-            // to avoid wandering too far:
-            if np.x < grid.xmin - 2
-                || np.x > grid.xmax + 2
-                || np.y < grid.ymin - 2
-                || np.y > grid.ymax + 2
-            {
-                continue;
-            }
-
             if visited.contains(&np) {
                 continue;
             }
@@ -195,11 +172,9 @@ fn flood_outside_band(grid: &mut Grid<Tile>) {
             }
 
             visited.insert(np);
+            grid.add_to_grid(np, Unsupported);
             q.push_back(np);
         }
-    }
-    for tile in visited {
-        grid.add_to_grid(tile, Unsupported)
     }
 }
 
@@ -250,7 +225,6 @@ fn solve2(input: &str) -> usize {
         .iter()
         .find(|(_area, p1, p2)| is_valid_area(&grid, *p1, *p2))
         .unwrap();
-
     // report its size
     *size as usize
 }
@@ -258,7 +232,7 @@ fn solve2(input: &str) -> usize {
 fn main() {
     let input = get_input("day9-input.txt");
     println!("{}", solve(&input));
-    println!("{}", solve2(&input));
+    run_timed(solve2, &input, 2)
 }
 
 #[cfg(test)]
@@ -266,10 +240,6 @@ mod tests {
     use super::*;
     #[test]
     fn test_solve() {
-        // 7 - 11 = -4
-        // 1 - 7 = -6
-
-        // 5*7 = 35
         assert_eq!(35, get_area(Point { x: 7, y: 1 }, Point { x: 11, y: 7 }));
     }
 }

@@ -3,6 +3,19 @@ use std::fmt;
 use std::fmt::{Debug, Display, Formatter};
 use std::ops::Add;
 
+pub const DIRS4: [(isize, isize); 4] = [(1, 0), (-1, 0), (0, 1), (0, -1)];
+
+pub const DIRS8: [(isize, isize); 8] = [
+    (1, 0),   // right
+    (-1, 0),  // left
+    (0, 1),   // down
+    (0, -1),  // up
+    (1, 1),   // down-right
+    (1, -1),  // up-right
+    (-1, 1),  // down-left
+    (-1, -1), // up-left
+];
+
 #[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
 pub struct Point {
     pub x: isize,
