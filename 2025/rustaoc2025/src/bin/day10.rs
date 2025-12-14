@@ -1,12 +1,137 @@
 use rustaoc2025::get_input;
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashMap, VecDeque};
 use std::str::FromStr;
 
 #[derive(Debug)]
 struct Machine {
     indicator_lights: u32,
     button_wiring: Vec<u32>,
-    joltage: Vec<usize>,
+    joltage: Vec<i32>,
+}
+
+const INF: i32 = 1_000_000; // big "impossible" value
+
+#[derive(Debug, Clone)]
+struct Pattern {
+    contrib: Vec<i32>, // summed contribution over all positions
+    cost: i32,         // how many buttons are used in this pattern
+}
+
+/// Build all patterns (2^buttons) from a generic button matrix.
+/// buttons: Vec<button>, button: Vec<i32> (usually 0/1)
+fn build_patterns(buttons: &[Vec<i32>]) -> Vec<Pattern> {
+    let m = buttons.len();
+    if m == 0 {
+        return vec![Pattern {
+            contrib: vec![],
+            cost: 0,
+        }];
+    }
+
+    let n = buttons[0].len();
+    let mut patterns = Vec::new();
+
+    for mask in 0..(1usize << m) {
+        let mut contrib = vec![0i32; n];
+        let mut cost = 0;
+
+        for (btn_idx, btn) in buttons.iter().enumerate() {
+            if (mask & (1 << btn_idx)) != 0 {
+                cost += 1;
+                for (i, &val) in btn.iter().enumerate() {
+                    contrib[i] += val;
+                }
+            }
+        }
+
+        patterns.push(Pattern { contrib, cost });
+    }
+
+    patterns
+}
+
+/// Recursive solver: minimum presses to reach `target` using `patterns`.
+/// Returns INF if impossible.
+fn solve_min_presses(
+    target: &[i32],
+    patterns: &[Pattern],
+    memo: &mut HashMap<Vec<i32>, i32>,
+) -> i32 {
+    // base case: all zeros
+    if target.iter().all(|&x| x == 0) {
+        return 0;
+    }
+
+    // memoization key
+    let key = target.to_vec();
+    if let Some(&cached) = memo.get(&key) {
+        return cached;
+    }
+
+    let mut best = INF;
+
+    'pattern_loop: for pattern in patterns {
+        // dimension must match
+        if pattern.contrib.len() != target.len() {
+            // you can also panic here if mismatched data should never happen
+            panic!(
+                "Pattern length mismatch: {} vs {}",
+                pattern.contrib.len(),
+                target.len()
+            );
+        }
+
+        let mut reduced = Vec::with_capacity(target.len());
+
+        // diff = target - contrib; must be nonnegative and even
+        for (i, target_value) in target.iter().enumerate() {
+            let diff = target_value - pattern.contrib[i];
+            if diff < 0 || diff % 2 != 0 {
+                continue 'pattern_loop; // invalid pattern for this target
+            }
+            // valid pattern: add half of the diff to reduced
+            reduced.push(diff / 2);
+        }
+
+        let min_presses = solve_min_presses(&reduced, patterns, memo);
+        if min_presses >= INF {
+            // break out of loop: impossible to reach target with this pattern
+            continue;
+        }
+
+        let candidate = pattern.cost + 2 * min_presses;
+        if candidate < best {
+            best = candidate;
+        }
+    }
+
+    memo.insert(key, best);
+    best
+}
+
+/// Public helper: given a target joltage vector and button matrix,
+/// compute minimal presses (or None if impossible).
+pub fn min_presses_generic(target: Vec<i32>, buttons: Vec<Vec<i32>>) -> Option<i32> {
+    if target.is_empty() {
+        return Some(0);
+    }
+
+    // sanity: all buttons same length as target
+    let n = target.len();
+    for (i, b) in buttons.iter().enumerate() {
+        if b.len() != n {
+            panic!("button {i} has length {}, expected {n}", b.len());
+        }
+    }
+
+    let patterns = build_patterns(&buttons);
+    let mut memo = HashMap::new();
+    let ans = solve_min_presses(&target, &patterns, &mut memo);
+    if ans >= INF {
+        None
+    } else {
+        Some(ans)
+    }
 }
 
 fn parse_line(line: &str) -> Result<Machine, String> {
@@ -68,7 +193,7 @@ fn parse_line(line: &str) -> Result<Machine, String> {
     let curly_values = curly_content
         .split(',')
         .filter(|s| !s.trim().is_empty())
-        .map(|s| usize::from_str(s.trim()))
+        .map(|s| i32::from_str(s.trim()))
         .collect::<Result<Vec<_>, _>>()
         .map_err(|e| format!("Invalid number in {{}}: {}", e))?;
 
@@ -87,13 +212,36 @@ fn solve(input: &str) -> u64 {
         .unwrap();
     let mut button_presses = 0;
     for machine in machines {
-        println!("{:?}", machine);
-        button_presses += set_joltage(machine);
+        button_presses += set_indicator_lights(machine) as u64;
+    }
+    button_presses
+}
+
+fn solve2(input: &str) -> u64 {
+    let machines = input
+        .lines()
+        .map(parse_line)
+        .collect::<Result<Vec<_>, _>>()
+        .unwrap();
+    let mut button_presses = 0;
+    for machine in machines {
+        let button_vec: Vec<Vec<i32>> = build_button_vec(&machine);
+        button_presses += min_presses_generic(machine.joltage, button_vec).unwrap();
     }
     button_presses as u64
 }
 
 fn set_indicator_lights(machine: Machine) -> usize {
+    let buttons = machine.button_wiring;
+    let target_value = machine.indicator_lights;
+
+    if let Some(value) = get_iterations(&buttons, target_value) {
+        return value;
+    }
+    10000000
+}
+
+fn get_iterations(buttons: &Vec<u32>, target_value: u32) -> Option<usize> {
     let mut experiments: VecDeque<u32> = VecDeque::new();
     experiments.push_back(0);
     let mut iterations: usize = 1;
@@ -103,11 +251,11 @@ fn set_indicator_lights(machine: Machine) -> usize {
         //println!("iterations {}", iterations);
 
         while let Some(value) = experiments.pop_front() {
-            for button in &machine.button_wiring {
+            for button in buttons {
                 //println!("button {} value {} result {}, desired value {}", button, value, value ^ button, machine.indicator_lights);
                 let new_value = value ^ button;
-                if new_value == machine.indicator_lights {
-                    return iterations;
+                if new_value == target_value {
+                    return Some(iterations);
                 }
                 values.push(new_value);
             }
@@ -121,209 +269,6 @@ fn set_indicator_lights(machine: Machine) -> usize {
     }
 }
 
-fn set_joltage(machine: Machine) -> usize {
-    let mut experiments: VecDeque<Vec<usize>> = VecDeque::new();
-    let mut visited: HashSet<Vec<usize>> = HashSet::new();
-
-    // push in the empty vec
-    experiments.push_back(vec![0; machine.joltage.len()]);
-    let mut iterations: usize = 1;
-
-    let mut button_vec: Vec<Vec<usize>> = Vec::new();
-
-    for button in &machine.button_wiring {
-        button_vec.push(
-            (0..machine.joltage.len())
-                .rev()
-                .map(|i| (*button as usize >> i) & 1)
-                .collect(),
-        )
-    }
-    //println!("starting loop");
-    loop {
-        let mut values: Vec<Vec<usize>> = Vec::new();
-        println!("iterations {}", iterations);
-
-        while let Some(value) = experiments.pop_front() {
-            if iterations > 18 {
-                println!("value {:?} target {:?}", value, machine.joltage);
-            }
-            for button in &button_vec {
-                //println!("button {} value {} result {}, desired value {}", button, value, value ^ button, machine.indicator_lights);
-                // increment vec value by 1 if position matches criterium
-                let new_value: Vec<usize> = button
-                    .iter()
-                    .zip(value.iter())
-                    .map(|(x, y)| x + y)
-                    .collect();
-
-                if new_value == machine.joltage {
-                    return iterations;
-                }
-                values.push(new_value);
-            }
-        }
-
-        for value in &values {
-            // only add novel values
-            if !visited.contains(value) {
-                experiments.push_back(value.clone());
-                visited.insert(value.clone());
-            }
-        }
-
-        iterations += 1;
-        if iterations > 100 {
-            panic!("Too many iterations");
-        }
-    }
-}
-
-fn lower_bound_extra_presses(remaining: &[i32]) -> i32 {
-    *remaining.iter().max().unwrap_or(&0)
-}
-
-/// Find minimum total presses to exactly reach target joltage,
-/// or None if impossible.
-fn min_presses_backtracking(machine: &Machine) -> Option<i32> {
-    let button_vec: Vec<Vec<i32>> = build_button_vec(machine);
-    // for vec in &button_vec {
-    //     println!("{:?}", vec);
-    // }
-    // return None;
-    let n_buttons = button_vec.len();
-    let n_indices = machine.joltage.len();
-
-    // Edge cases
-    if n_indices == 0 {
-        return Some(0);
-    }
-    if n_buttons == 0 {
-        return if machine.joltage.iter().all(|&x| x == 0) {
-            Some(0)
-        } else {
-            None
-        };
-    }
-
-    // Remaining joltage we still need at each index
-    let mut remaining: Vec<i32> = machine.joltage.clone().iter().map(|&x| x as i32).collect();
-    let mut best: Option<i32> = None;
-
-    fn dfs(
-        idx: usize,
-        presses_so_far: i32,
-        remaining: &mut [i32],
-        buttons: &Vec<Vec<i32>>,
-        best: &mut Option<i32>,
-        memo: &mut HashMap<(usize, Vec<i32>), Option<i32>>,
-    ) {
-        // Global branch & bound with lower bound
-        if let Some(b) = *best {
-            let lb = lower_bound_extra_presses(remaining);
-            if presses_so_far + lb >= b {
-                return;
-            }
-        }
-
-        // Goal reached
-        if remaining.iter().all(|&r| r == 0) {
-            match best {
-                Some(b) if presses_so_far >= *b => {}
-                _ => *best = Some(presses_so_far),
-            }
-            return;
-        }
-
-        // Out of buttons → dead end
-        if idx == buttons.len() {
-            return;
-        }
-
-        // Memoization: state is (idx, remaining vector)
-        let state_key = (idx, remaining.to_vec());
-
-        if let Some(cached_extra) = memo.get(&state_key) {
-            if let (Some(global_best), Some(extra)) = (*best, *cached_extra) {
-                // From this state, even optimal continuation can't beat global best
-                if presses_so_far + extra >= global_best {
-                    return;
-                }
-            }
-            // If cached_extra is None, we know this state never improved best; we can still prune:
-            if cached_extra.is_none() {
-                return;
-            }
-        }
-
-        // Save previous global best to compute local gain later
-        let prev_best = *best;
-
-        let btn = &buttons[idx];
-
-        // Compute maximum times we can press this button without overshooting
-        let mut max_cnt: i32 = i32::MAX;
-        let mut has_effect = false;
-
-        for (k, &val) in btn.iter().enumerate() {
-            if val == 1 {
-                has_effect = true;
-                max_cnt = max_cnt.min(remaining[k]);
-            }
-        }
-
-        if !has_effect {
-            // button has no effect, just skip it
-            dfs(idx + 1, presses_so_far, remaining, buttons, best, memo);
-        } else if max_cnt <= 0 {
-            // can't use this button at all, skip to next
-            dfs(idx + 1, presses_so_far, remaining, buttons, best, memo);
-        } else {
-            // Try pressing this button cnt times, from 0..=max_cnt
-            for cnt in 0..=max_cnt {
-                if cnt > 0 {
-                    for (k, &val) in btn.iter().enumerate() {
-                        if val == 1 {
-                            remaining[k] -= cnt;
-                        }
-                    }
-                }
-
-                dfs(
-                    idx + 1,
-                    presses_so_far + cnt,
-                    remaining,
-                    buttons,
-                    best,
-                    memo,
-                );
-
-                if cnt > 0 {
-                    for (k, &val) in btn.iter().enumerate() {
-                        if val == 1 {
-                            remaining[k] += cnt;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Compute how much better (locally) this state can do compared to when we entered it
-        let local_extra: Option<i32> = match (prev_best, *best) {
-            (None, Some(new_best)) => Some(new_best - presses_so_far),
-            (Some(old_best), Some(new_best)) if new_best < old_best => {
-                Some(new_best - presses_so_far)
-            }
-            _ => None, // this state never produced an improvement
-        };
-
-        memo.insert(state_key, local_extra);
-    }
-    let mut memo: HashMap<(usize, Vec<i32>), Option<i32>> = HashMap::new();
-    dfs(0, 0, &mut remaining, &button_vec, &mut best, &mut memo);
-    best
-}
-
 fn build_button_vec(machine: &Machine) -> Vec<Vec<i32>> {
     let mut button_vec: Vec<Vec<i32>> = Vec::new();
     for button in &machine.button_wiring {
@@ -334,21 +279,13 @@ fn build_button_vec(machine: &Machine) -> Vec<Vec<i32>> {
         )
     }
 
-    // Sort buttons by "strength": more ones, or heavier indices first
-    let mut indexed: Vec<(usize, Vec<i32>)> = button_vec.into_iter().enumerate().collect();
-
-    indexed.sort_by_key(|(_, bits)| {
-        // negative: we want descending
-        let ones = bits.iter().filter(|&&x| x == 1).count() as i32;
-        -ones
-    });
-
-    indexed.into_iter().map(|(_, bits)| bits).collect()
+    button_vec
 }
 
 fn main() {
     let input = get_input("day10-input.txt");
     println!("{}", solve(&input));
+    println!("{}", solve2(&input));
 }
 
 #[cfg(test)]
@@ -372,20 +309,37 @@ mod tests {
     fn test_joltage() {
         let line = "[.##.] (3) (1,3) (2) (2,3) (0,2) (0,1) {3,5,4,7}";
         let machine = parse_line(line).unwrap();
-        assert_eq!(10, min_presses_backtracking(&machine).unwrap());
+        let button_vec: Vec<Vec<i32>> = build_button_vec(&machine);
 
-        assert_eq!(10, set_joltage(machine));
+        assert_eq!(
+            10,
+            min_presses_generic(machine.joltage, button_vec).unwrap()
+        );
 
         let line = "[...#...] (0,2,3,6) (0,1,4,6) (1,3,4,5) (1,2,4,6) (0,2,3,4,5) (2,3,6) (1,2) (2,3,4,5,6) {37,24,84,71,44,32,71}";
         let machine = parse_line(line).unwrap();
-        println!("{:?}", min_presses_backtracking(&machine));
+        let button_vec: Vec<Vec<i32>> = build_button_vec(&machine);
+        assert_eq!(
+            90,
+            min_presses_generic(machine.joltage, button_vec).unwrap()
+        );
 
         let line = "[...#.] (0,2,3,4) (2,3) (0,4) (0,1,2) (1,2,3,4) {7,5,12,7,2}";
         let machine = parse_line(line).unwrap();
-        assert_eq!(12, min_presses_backtracking(&machine).unwrap());
+        let button_vec: Vec<Vec<i32>> = build_button_vec(&machine);
+
+        assert_eq!(
+            12,
+            min_presses_generic(machine.joltage, button_vec).unwrap()
+        );
 
         let line = "[.###.#] (0,1,2,3,4) (0,3,4) (0,1,2,4,5) (1,2) {10,11,11,5,10,5}";
         let machine = parse_line(line).unwrap();
-        assert_eq!(11, min_presses_backtracking(&machine).unwrap());
+        let button_vec: Vec<Vec<i32>> = build_button_vec(&machine);
+
+        assert_eq!(
+            11,
+            min_presses_generic(machine.joltage, button_vec).unwrap()
+        );
     }
 }
