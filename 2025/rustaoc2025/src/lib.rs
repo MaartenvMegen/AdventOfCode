@@ -1,4 +1,3 @@
-mod bfs;
 pub mod grid;
 
 use std::fmt::Debug;
